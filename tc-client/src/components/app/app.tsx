@@ -8,14 +8,13 @@ import Note from '../../components/note/note';
 
 const TimeClockApplication: React.FC = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path='/' element={<ShiftView />} />
-        <Route path='/start-shift' element={<StartShift />} />
-        <Route path='/note' element={<Note />} />
-      </Routes>
-    </Router>
-
+      <Router>
+        <Routes>
+          <Route path='/' element={<ShiftView />} />
+          <Route path='/start-shift' element={<StartShift />} />
+          <Route path='/note' element={<Note />} />
+        </Routes>
+      </Router>
   );
 };
 

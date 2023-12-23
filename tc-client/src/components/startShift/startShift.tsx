@@ -52,10 +52,13 @@ const StartShift: React.FC = () => {
     const handleNewReturningSubmit = (e: React.FormEvent): void => {
         e.preventDefault();
         setIsLoading(true);
-        alert('Selected Employee: ' + selectedEmployee);
         setTimeout(() => {
             setIsLoading(false);
-            navigate('/');
+            navigate('/', {
+                state: {
+                    newestUser: selectedEmployee
+                }
+            });
         }, 300);
     };
 
@@ -86,7 +89,7 @@ const StartShift: React.FC = () => {
                 {/* Conditional rendering based on userStatus */}
                 {userStatus === UserStatus.NEW && (
                     <div className="mt-8 max-w-lg mx-auto bg-white p-6 rounded shadow">
-                        <h3 className="text-2xl font-semibold mb-6">Please fill in all fields</h3>
+                        <h3 className="text-xl font-semibold mb-6">Please fill in all fields</h3>
                         <form className="space-y-4" onSubmit={handleNewUserSubmit}>
                             <div className="mb-4">
                                 <label htmlFor="fullName" className="text-gray-700 font-semibold">Full Name (First & Last) </label>
@@ -147,7 +150,7 @@ const StartShift: React.FC = () => {
                 {userStatus === UserStatus.RETURNING && (
                     <div className="mt-8 max-w-md mx-auto bg-white p-6 rounded shadow text-xl">
                         <form onSubmit={handleNewReturningSubmit}>
-                            <label className="block mb-6">
+                            <label className="block mb-10">
                                 <span className="text-gray-700">Select Your Name 👇</span>
                                 <select
                                     className="form-select block w-full mt-1 text-2xl"

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
+import Toast from '../../components/toast/toast';
 
 interface Shift {
     shiftId: number;
@@ -14,8 +16,10 @@ interface Shift {
 }
 
 const ShiftView: React.FC = () => {
-    const [shifts, setShifts] = useState<Shift[]>([]);
+    const location = useLocation();
+    const { newestUser } = location.state || {};
 
+    const [shifts, setShifts] = useState<Shift[]>([]);
 
     useEffect(() => {
         axios.get('/api/shifts')
@@ -25,7 +29,8 @@ const ShiftView: React.FC = () => {
             })
             .catch(error => {
                 console.error('Error fetching shifts:', error);
-            });
+            })
+        
     }, []);
 
     const handleClockOut = (shiftId: number) => {
@@ -79,6 +84,7 @@ const ShiftView: React.FC = () => {
 
     return (
         <div className="flex h-screen">
+            {newestUser != undefined ? (<Toast message={newestUser + " has started a shift!"} />) : null}
             {/* Sidebar */}
             <div className="bg-gray-800 text-white w-72 p-6 fixed h-full">
                 <h3 className="text-xl font-semibold fancy-text">The Candy Factory Timesheet</h3>
