@@ -7,6 +7,9 @@ build/
 
 **node_modules
 
+tc-server/src/main/resources/static
+tc-server/src/main/resources/templates/
+
 ### STS ###
 .apt_generated
 .classpath
