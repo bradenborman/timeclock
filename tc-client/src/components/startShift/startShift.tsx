@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 enum UserStatus {
@@ -7,11 +8,31 @@ enum UserStatus {
     NEW = 'NEW',
 }
 
+interface User {
+    userId: string;
+    userName: string;
+    phoneNumber: string;
+    email: string;
+    paymentMethod: string;
+}
+
 const StartShift: React.FC = () => {
     const [userStatus, setUserStatus] = useState<UserStatus>(UserStatus.NOT_SET);
-    const [employees] = useState(Array.from({ length: 20 }, (_, i) => `Employee ${i + 1}`));
+    const [employees, setEmployees] = useState<User[]>([]);
+    const [selectedEmployee, setSelectedEmployee] = useState<string>();
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        axios.get('/api/users')
+            .then(response => {
+                console.log(response.data)
+                setEmployees(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching users:', error);
+            });
+    }, []);
 
 
     const handleUserStatusChange = (status: UserStatus) => {
@@ -30,13 +51,13 @@ const StartShift: React.FC = () => {
 
     const handleNewReturningSubmit = (e: React.FormEvent): void => {
         e.preventDefault();
-        setIsLoading(true); // Start loading
+        setIsLoading(true);
+        alert('Selected Employee: ' + selectedEmployee);
         setTimeout(() => {
-            // Stop loading and navigate back to home
             setIsLoading(false);
             navigate('/');
         }, 300);
-    }
+    };
 
     return (
         <div className="bg-gray-100 min-h-screen flex justify-center items-center">
@@ -128,20 +149,26 @@ const StartShift: React.FC = () => {
                         <form onSubmit={handleNewReturningSubmit}>
                             <label className="block mb-6">
                                 <span className="text-gray-700">Select Your Name 👇</span>
-                                <select className="form-select block w-full mt-1 text-2xl">
+                                <select
+                                    className="form-select block w-full mt-1 text-2xl"
+                                    value={selectedEmployee}
+                                    onChange={(e) => setSelectedEmployee(e.target.value)}
+                                >
+                                    <option selected disabled>Select Youself</option>
                                     {employees.map((employee, index) => (
-                                        <option key={index}>{employee}</option>
+                                        <option key={index} value={employee.userId}>{employee.userName}</option>
                                     ))}
                                 </select>
                             </label>
                             <button
                                 type="submit"
                                 className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${isLoading ? 'opacity-50' : ''}`}
-                                disabled={isLoading}
+                                disabled={isLoading || selectedEmployee == undefined}
                             >
                                 {isLoading ? 'Submitting...' : 'Start Shift'}
                             </button>
                         </form>
+
                     </div>
                 )}
             </div>

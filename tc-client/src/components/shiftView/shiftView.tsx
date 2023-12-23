@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+
 
 interface Shift {
     shiftId: number;
@@ -10,55 +12,67 @@ interface Shift {
     timeWorked?: string;  // Optional property for time worked
     isLoading?: boolean;
 }
-let mockShifts: Shift[] = [];
-
-for (var i = 1; i <= 5; i++) {
-    mockShifts.push({
-        shiftId: i,
-        userId: i,
-        userName: 'Employee ' + i,
-        clockIn: '9:00 AM',
-        clockOut: ''
-    });
-}
-
-mockShifts.push({
-    shiftId: 56,
-    userId: 5,
-    userName: 'Employee ' + 5,
-    clockIn: '9:00 AM',
-    clockOut: ''
-});
 
 const ShiftView: React.FC = () => {
-    const [shifts, setShifts] = useState<Shift[]>(mockShifts);
+    const [shifts, setShifts] = useState<Shift[]>([]);
+
+
+    useEffect(() => {
+        axios.get('/api/shifts')
+            .then(response => {
+                console.log(response.data)
+                setShifts(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching shifts:', error);
+            });
+    }, []);
 
     const handleClockOut = (shiftId: number) => {
-        const updatedShifts = shifts.map(shift => {
-            if (shift.shiftId === shiftId) {  // Check against shiftId instead of userId
-                return { ...shift, isLoading: true };
-            }
-            return shift;
+        // Find the shift that matches the shiftId
+        const shiftIndex = shifts.findIndex(s => s.shiftId === shiftId);
+        if (shiftIndex === -1) {
+            console.error('Shift not found');
+            return;
+        }
+
+        // Capture the current time
+        const currentTime = new Date().toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
         });
 
-        setShifts(updatedShifts);
+        // Create an updated shift object with the current time as clockOut and isLoading as true
+        const updatedShift = {
+            ...shifts[shiftIndex],
+            clockOut: currentTime,
+            isLoading: true
+        };
 
-        setTimeout(() => {
-            const newShifts = shifts.map(shift => {
-                if (shift.shiftId === shiftId) {
-                    const currentTime = new Date().toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                    });
-                    return { ...shift, clockOut: currentTime, isLoading: false };
-                }
-                return shift;
+        // Update the state to show the shift as loading and set the clockOut time
+        setShifts(shifts.map((s, index) => index === shiftIndex ? updatedShift : s));
+
+        // Post the updated shift to the server
+        axios.post('/api/clockout', updatedShift)
+            .then(response => {
+                // Update the specific shift with the response data and set isLoading to false
+                const newShifts = shifts.map((s, index) => {
+                    if (index === shiftIndex) {
+                        return { ...s, clockOut: currentTime, isLoading: false, timeWorked: response.data };
+                    }
+                    return s;
+                });
+
+                setShifts(newShifts);
+            })
+            .catch(error => {
+                console.error('Error clocking out:', error);
+                // If there's an error, update the shift to remove the loading state but keep the clockOut time
+                setShifts(shifts.map((s, index) => index === shiftIndex ? { ...s, isLoading: false } : s));
             });
-
-            setShifts(newShifts);
-        }, 300);
     };
+
 
 
     const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
