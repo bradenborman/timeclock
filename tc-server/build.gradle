@@ -1,0 +1,68 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.10-SNAPSHOT'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+group = 'candyfactory'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '1.8'
+}
+repositories {
+	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
+	maven { url 'https://repo.spring.io/snapshot' }
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+task copyClient(dependsOn: ":tc-client:clientBuild") {
+
+	doFirst {
+		delete "src/main/resources/static"
+		delete "src/main/resources/templates"
+	}
+	doLast {
+		copy {
+			from new File(project(":tc-client").getProjectDir(), "build")
+			into "src/main/resources/static"
+		}
+		copy {
+			from new File(project(":tc-client").getProjectDir(), "build/index.html")
+			into "src/main/resources/templates"
+		}
+	}
+}
+
+jar {
+	enabled = false
+}
+
+task finalizeBuild(type: Copy) {
+	dependsOn 'build'
+
+	println "Renaming jar.."
+	from "${buildDir}/libs/tc-server-${version}.jar"
+	into "${buildDir}/libs"
+	rename "tc-server-${version}.jar", "timeclock.jar"
+	delete "tc-server-${version}.jar"
+}
+
+processResources.dependsOn(copyClient)
+clean.dependsOn(":tc-client:clientClean")
+build.finalizedBy(finalizeBuild)
+
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
