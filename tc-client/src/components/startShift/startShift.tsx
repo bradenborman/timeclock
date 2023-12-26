@@ -52,15 +52,17 @@ const StartShift: React.FC = () => {
     const handleNewReturningSubmit = (e: React.FormEvent): void => {
         e.preventDefault();
         setIsLoading(true);
+
         setTimeout(() => {
             setIsLoading(false);
             navigate('/', {
                 state: {
-                    newestUser: selectedEmployee
+                    newestUser: selectedEmployee,
                 }
             });
         }, 300);
     };
+
 
     return (
         <div className="bg-gray-100 min-h-screen flex justify-center items-center">

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import Toast from '../../components/toast/toast';
 
@@ -17,9 +17,21 @@ interface Shift {
 
 const ShiftView: React.FC = () => {
     const location = useLocation();
-    const { newestUser } = location.state || {};
+    const navigate = useNavigate();
+    let { newestUser } = location.state || {};
 
     const [shifts, setShifts] = useState<Shift[]>([]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const { newestUser, ...restState } = location.state || {};
+            if (newestUser) {
+                navigate(location.pathname, { state: { ...restState }, replace: true });
+            }
+        }, 3000);
+        return () => clearTimeout(timer);
+    }, [location, navigate]);
+
 
     useEffect(() => {
         axios.get('/api/shifts')
@@ -30,7 +42,7 @@ const ShiftView: React.FC = () => {
             .catch(error => {
                 console.error('Error fetching shifts:', error);
             })
-        
+
     }, []);
 
     const handleClockOut = (shiftId: number) => {
@@ -94,7 +106,7 @@ const ShiftView: React.FC = () => {
                 <hr />
                 <ul className="mt-5">
                     <li className='mt-8'>
-                        <Link to="/start-shift" className="text-4xl text-indigo-200 hover:text-indigo-100 font-bold">
+                        <Link to="/start-shift" className="text-5xl text-indigo-200 hover:text-indigo-100 font-bold">
                             Start Shift
                         </Link>
                     </li>
