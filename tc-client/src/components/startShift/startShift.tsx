@@ -8,7 +8,7 @@ enum UserStatus {
     NEW = 'NEW',
 }
 
-interface User {
+export interface User {
     userId: string;
     name: string;
     phoneNumber: string;
@@ -22,6 +22,14 @@ const StartShift: React.FC = () => {
     const [selectedEmployee, setSelectedEmployee] = useState<string>();
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+
+    //NEW USER VARS 
+    // Define state variables
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('');
+
 
     useEffect(() => {
         axios.get('/api/users')
@@ -41,13 +49,31 @@ const StartShift: React.FC = () => {
 
     const handleNewUserSubmit = (e: React.FormEvent): void => {
         e.preventDefault();
-        setIsLoading(true); // Start loading
-        setTimeout(() => {
-            // Stop loading and navigate back to home
-            setIsLoading(false);
-            navigate('/');
-        }, 300);
+        setIsLoading(true);
+
+        const userData = {
+            name,
+            email,
+            phoneNumber,
+            paymentMethod
+        };
+
+        axios.post('/api/user', userData)
+            .then(response => {
+                setIsLoading(false);
+                navigate('/', {
+                    state: {
+                        newestUser: name,
+                    }
+                });
+            })
+            .catch(error => {
+                setIsLoading(false);
+                alert("ERROR Check console")
+                console.error('There was an error!', error);
+            });
     }
+
 
     const handleNewReturningSubmit = (e: React.FormEvent): void => {
         e.preventDefault();
@@ -55,9 +81,10 @@ const StartShift: React.FC = () => {
 
         setTimeout(() => {
             setIsLoading(false);
+            const name: string = employees.find(employee => employee.userId === selectedEmployee)?.name || "New Employee";
             navigate('/', {
                 state: {
-                    newestUser: selectedEmployee,
+                    newestUser: name,
                 }
             });
         }, 300);
@@ -99,6 +126,8 @@ const StartShift: React.FC = () => {
                                     required
                                     type="text"
                                     id="fullName"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
                                     className="form-input mt-1 p-1 block w-full border border-gray-300 focus:border-blue-500"
                                     placeholder="John Johnson"
                                 />
@@ -109,6 +138,8 @@ const StartShift: React.FC = () => {
                                     required
                                     type="email"
                                     id="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     className="form-input mt-1 p-1 block w-full border border-gray-300 focus:border-blue-500"
                                     placeholder="john@example.com"
                                     autoComplete="off"
@@ -120,6 +151,8 @@ const StartShift: React.FC = () => {
                                     required
                                     type="tel"
                                     id="phoneNumber"
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
                                     className="form-input mt-1 p-1 block w-full border border-gray-300 focus:border-blue-500"
                                     placeholder="123-456-7890"
                                     autoComplete="off"
@@ -131,8 +164,10 @@ const StartShift: React.FC = () => {
                                     required
                                     type="text"
                                     id="paymentMethod"
+                                    value={paymentMethod}
+                                    onChange={(e) => setPaymentMethod(e.target.value)}
                                     className="form-input mt-1 p-1 block w-full border border-gray-300 focus:border-blue-500"
-                                    placeholder="Venmo: @username"
+                                    placeholder="EX: Venmo: @username / TBD"
                                     autoComplete="off"
                                 />
                             </div>

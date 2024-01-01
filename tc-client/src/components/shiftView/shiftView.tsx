@@ -34,7 +34,7 @@ const ShiftView: React.FC = () => {
 
 
     useEffect(() => {
-        axios.get('/api/shifts')
+        axios.get(`/api/shifts?date=${new Date().toISOString().split('T')[0]}`)
             .then(response => {
                 console.log(response.data)
                 setShifts(response.data);

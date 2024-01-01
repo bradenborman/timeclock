@@ -3,7 +3,7 @@ package timeclock.models;
 public class Shift {
 
     private int shiftId;
-    private int userId;
+    private String userId;
     private String userName;
     private String clockIn;
     private String clockOut;
@@ -17,11 +17,11 @@ public class Shift {
         this.shiftId = shiftId;
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

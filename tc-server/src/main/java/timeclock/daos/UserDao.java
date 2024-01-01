@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import timeclock.models.User;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class UserDao {
@@ -16,11 +17,16 @@ public class UserDao {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public void insertUser(User user) {
-        final String sql = "INSERT INTO Users (name, phoneNumber, email, paymentMethod) " +
-                "VALUES (UUID(), :name, :phoneNumber, :email, :paymentMethod)";
+    public String insertUser(User user) {
+        String uuid = UUID.randomUUID().toString();
+        user.setUserId(uuid);
+
+        final String sql = "INSERT INTO Users (userId, name, phoneNumber, email, paymentMethod) " +
+                "VALUES (:userId, :name, :phoneNumber, :email, :paymentMethod)";
 
         namedParameterJdbcTemplate.update(sql, new BeanPropertySqlParameterSource(user));
+
+        return uuid;
     }
 
     public List<User> selectAllUsers() {

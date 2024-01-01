@@ -10,6 +10,7 @@ import timeclock.services.UserService;
 import timeclock.services.ShiftService;
 import timeclock.utilities.WorkSheetBuilder;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RequestMapping("/api")
@@ -46,8 +47,8 @@ public class ApiController {
     }
 
     @GetMapping("/shifts")
-    public ResponseEntity<List<Shift>> getAllShiftsStartedByDate(@RequestParam(required = false) String date) {
-        return ResponseEntity.ok(shiftService.getAllShiftsStartedByDate(date));
+    public ResponseEntity<List<Shift>> getAllShiftsStartedByDate(@RequestParam String date) {
+        return ResponseEntity.ok(shiftService.findShiftsByDate(LocalDate.parse(date)));
     }
 
     @PostMapping("/clockout")
