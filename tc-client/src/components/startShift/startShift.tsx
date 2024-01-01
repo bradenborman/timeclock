@@ -79,17 +79,25 @@ const StartShift: React.FC = () => {
         e.preventDefault();
         setIsLoading(true);
 
-        setTimeout(() => {
-            setIsLoading(false);
-            const name: string = employees.find(employee => employee.userId === selectedEmployee)?.name || "New Employee";
-            navigate('/', {
-                state: {
-                    newestUser: name,
-                }
-            });
-        }, 300);
+        axios.post('/api/clockin', null, {
+            params: {
+                userId: selectedEmployee,
+            }
+        })
+            .then(() => {
+                setIsLoading(false);
+                const name: string = employees.find(employee => employee.userId === selectedEmployee)?.name || "New Employee";
+                navigate('/', {
+                    state: {
+                        newestUser: name,
+                    }
+                });
+            })
+            .catch((error) => {
+                console.error('There was an error clocking in:', error);
+                setIsLoading(false);
+            })
     };
-
 
     return (
         <div className="bg-gray-100 min-h-screen flex justify-center items-center">
