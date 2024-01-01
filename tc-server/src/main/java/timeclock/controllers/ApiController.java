@@ -26,6 +26,12 @@ public class ApiController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
+    @PostMapping("/user")
+    public ResponseEntity<Void> createUser(@RequestBody User user) {
+        userService.insertUser(user);
+       return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/shifts")
     public ResponseEntity<List<Shift>> getAllShiftsStartedByDate(@RequestParam(required = false) String date) {
         return ResponseEntity.ok(shiftService.getAllShiftsStartedByDate(date));

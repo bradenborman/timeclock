@@ -1,6 +1,7 @@
 package timeclock.services;
 
 import org.springframework.stereotype.Service;
+import timeclock.daos.UserDao;
 import timeclock.models.User;
 
 import java.util.Arrays;
@@ -9,17 +10,18 @@ import java.util.List;
 @Service
 public class UserService {
 
+    private final UserDao userDao;
+
+    public UserService(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     public List<User> getAllUsers() {
-        User user1 = new User();
-        user1.setUserName("Braden Borman");
-        user1.setUserId("1");
-
-        User user2 = new User();
-        user2.setUserName("Albert Teddy");
-        user2.setUserId("2");
-
-
-        return Arrays.asList(user1, user2);
+        return userDao.selectAllUsers();
     }
+
+    public void insertUser(User user) {
+        userDao.insertUser(user);
+    }
+
 }

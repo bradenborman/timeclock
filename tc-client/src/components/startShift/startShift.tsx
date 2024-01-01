@@ -10,7 +10,7 @@ enum UserStatus {
 
 interface User {
     userId: string;
-    userName: string;
+    name: string;
     phoneNumber: string;
     email: string;
     paymentMethod: string;
@@ -161,7 +161,7 @@ const StartShift: React.FC = () => {
                                 >
                                     <option selected disabled>Select Youself</option>
                                     {employees.map((employee, index) => (
-                                        <option key={index} value={employee.userId}>{employee.userName}</option>
+                                        <option key={index} value={employee.userId}>{employee.name}</option>
                                     ))}
                                 </select>
                             </label>

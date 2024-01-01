@@ -3,7 +3,7 @@ package timeclock.models;
 public class User {
 
     private String userId;
-    private String userName;
+    private String name;
     private String phoneNumber;
     private String email;
     private String paymentMethod;
@@ -16,12 +16,12 @@ public class User {
         this.userId = userId;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getName() {
+        return name;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPhoneNumber() {

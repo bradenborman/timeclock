@@ -5,6 +5,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+tc-server/src/main/resources/application-secret.yml
+
 **node_modules
 
 tc-server/src/main/resources/static

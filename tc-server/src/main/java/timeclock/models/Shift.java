@@ -8,7 +8,6 @@ public class Shift {
     private String clockIn;
     private String clockOut;
     private String timeWorked;
-    private Boolean isLoading;
 
     public int getShiftId() {
         return shiftId;
@@ -56,14 +55,6 @@ public class Shift {
 
     public void setTimeWorked(String timeWorked) {
         this.timeWorked = timeWorked;
-    }
-
-    public Boolean getLoading() {
-        return isLoading;
-    }
-
-    public void setLoading(Boolean loading) {
-        isLoading = loading;
     }
 
 }

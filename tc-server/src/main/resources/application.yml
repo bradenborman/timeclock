@@ -1,3 +1,8 @@
 spring:
   thymeleaf:
     prefix: classpath:/static/
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#    hikari:
+#      connection-test-query: SELECT * from Shiftsss
+#      validation-timeout: 5000
