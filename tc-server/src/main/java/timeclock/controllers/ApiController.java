@@ -1,5 +1,6 @@
 package timeclock.controllers;
 
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import timeclock.models.Shift;
@@ -7,6 +8,7 @@ import timeclock.models.User;
 import timeclock.services.EmailService;
 import timeclock.services.UserService;
 import timeclock.services.ShiftService;
+import timeclock.utilities.WorkSheetBuilder;
 
 import java.util.List;
 
@@ -27,7 +29,8 @@ public class ApiController {
 
     @GetMapping("/email")
     public ResponseEntity<Void> email() {
-        emailService.sendWorksheetEmail(null);
+        ByteArrayResource document = new WorkSheetBuilder().populateWorkbook().toFile();
+        emailService.sendWorksheetEmail(document);
         return ResponseEntity.ok().build();
     }
 

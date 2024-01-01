@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import timeclock.daos.UserDao;
 import timeclock.models.User;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service

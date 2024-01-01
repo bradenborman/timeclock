@@ -26,6 +26,10 @@ dependencies {
 	//DB Driver
 	implementation 'mysql:mysql-connector-java:8.0.23'
 
+	//Excel document
+	implementation 'org.apache.poi:poi:5.2.0'
+	implementation 'org.apache.poi:poi-ooxml:5.2.0'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
