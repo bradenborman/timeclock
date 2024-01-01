@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import timeclock.models.Shift;
 import timeclock.models.User;
+import timeclock.services.EmailService;
 import timeclock.services.UserService;
 import timeclock.services.ShiftService;
 
@@ -16,9 +17,18 @@ public class ApiController {
     private final UserService userService;
     private final ShiftService shiftService;
 
-    public ApiController(UserService userService, ShiftService shiftService) {
+    private final EmailService emailService;
+
+    public ApiController(UserService userService, ShiftService shiftService, EmailService emailService) {
         this.userService = userService;
         this.shiftService = shiftService;
+        this.emailService = emailService;
+    }
+
+    @GetMapping("/email")
+    public ResponseEntity<Void> email() {
+        emailService.sendWorksheetEmail(null);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/users")
