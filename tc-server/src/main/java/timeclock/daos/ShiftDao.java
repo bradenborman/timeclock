@@ -73,4 +73,14 @@ public class ShiftDao {
         namedParameterJdbcTemplate.update(sql, params);
     }
 
+    public void clockOutShift(int shiftId, Timestamp clockOutTimestamp, String timeWorked) {
+        final String sql = "UPDATE Shifts SET clockOut = :clockOut, timeWorked = :timeWorked WHERE shiftId = :shiftId";
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("clockOut", clockOutTimestamp);
+        params.addValue("timeWorked", timeWorked);
+        params.addValue("shiftId", shiftId);
+
+        namedParameterJdbcTemplate.update(sql, params);
+    }
 }

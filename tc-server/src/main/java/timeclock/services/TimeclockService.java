@@ -41,6 +41,7 @@ public class TimeclockService {
        return shiftService.findShiftsByDate(LocalDate.parse(date));
     }
 
+    @Transactional
     public String clockOutShift(Shift shift) {
         return shiftService.clockOutShift(shift);
     }

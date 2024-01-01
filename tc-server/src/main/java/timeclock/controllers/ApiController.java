@@ -42,9 +42,7 @@ public class ApiController {
 
     @PostMapping("/clockout")
     public ResponseEntity<String> clockOut(@RequestBody Shift shift) {
-            return ResponseEntity.ok().body(
-                    timeclockService.clockOutShift(shift)
-            );
+            return ResponseEntity.ok().body(timeclockService.clockOutShift(shift));
     }
 
 }
