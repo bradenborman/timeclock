@@ -44,7 +44,7 @@ public class ShiftDao {
             Timestamp clockOutTimestamp = rs.getTimestamp("clockOut");
             if (clockOutTimestamp != null) {
                 LocalDateTime clockOut = clockOutTimestamp.toLocalDateTime();
-                shift.setClockIn(clockOut.format(formatter));
+                shift.setClockOut(clockOut.format(formatter));
             }
 
             shift.setTimeWorked(rs.getString("timeWorked"));
