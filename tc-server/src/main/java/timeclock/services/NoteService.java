@@ -2,7 +2,10 @@ package timeclock.services;
 
 import org.springframework.stereotype.Service;
 import timeclock.daos.NotesDao;
+import timeclock.models.Note;
 import timeclock.utilities.DateUtility;
+
+import java.util.List;
 
 @Service
 public class NoteService {
@@ -17,4 +20,7 @@ public class NoteService {
         notesDao.insertNewNote(note, DateUtility.now());
     }
 
+    public List<Note> findAllNotes() {
+        return notesDao.selectAllNotes();
+    }
 }

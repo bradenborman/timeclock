@@ -2,6 +2,7 @@ package timeclock.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import timeclock.models.Note;
 import timeclock.models.Shift;
 import timeclock.models.User;
 import timeclock.services.TimeclockService;
@@ -49,6 +50,11 @@ public class ApiController {
     public ResponseEntity<Void> note(@RequestBody String note) {
         timeclockService.recordNewNote(note);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/notes")
+    public ResponseEntity<List<Note>> notes() {
+        return ResponseEntity.ok(timeclockService.findAllNotes());
     }
 
     @DeleteMapping("/shift/{shiftId}")

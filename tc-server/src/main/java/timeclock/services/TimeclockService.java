@@ -2,11 +2,12 @@ package timeclock.services;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import timeclock.models.Note;
 import timeclock.models.Shift;
 import timeclock.models.User;
+import timeclock.utilities.DateUtility;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -41,7 +42,9 @@ public class TimeclockService {
     }
 
     public List<Shift> findShiftsByDate(String date) {
-        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
+//        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
+        LocalDate localDate = DateUtility.todayCentralTime();
+
         return shiftService.findShiftsByDate(localDate);
     }
 
@@ -57,5 +60,9 @@ public class TimeclockService {
 
     public void removeShift(String shiftId) {
         shiftService.removeShift(shiftId);
+    }
+
+    public List<Note> findAllNotes() {
+       return noteService.findAllNotes();
     }
 }
