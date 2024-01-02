@@ -7,13 +7,13 @@ import timeclock.services.EmailService;
 @Configuration
 public class CronConfig {
 
-    private EmailService emailService;
+    private final EmailService emailService;
 
     public CronConfig(EmailService emailService) {
         this.emailService = emailService;
     }
 
-    @Scheduled(cron = "0 36 23 * * ?") //11:30 PM
+    @Scheduled(cron = "0 38 23 * * ?") //11:30 PM
     public void sendReport() {
         emailService.sendWorksheetEmailTest();
     }
