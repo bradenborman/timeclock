@@ -13,7 +13,7 @@ public class CronConfig {
         this.emailService = emailService;
     }
 
-    @Scheduled(cron = "0 30 23 * * ?") //11:30 PM
+    @Scheduled(cron = "0 45 19 * * ?") //11:30 PM
     public void sendReport() {
         emailService.sendWorksheetEmailTest();
     }
