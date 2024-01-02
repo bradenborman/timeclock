@@ -33,7 +33,7 @@ public class ShiftDao {
             Shift shift = new Shift();
             shift.setShiftId(rs.getInt("shiftId"));
             shift.setUserId(rs.getString("userId"));
-            shift.setUserName(rs.getString("name"));
+            shift.setName(rs.getString("name"));
 
             Timestamp clockInTimestamp = rs.getTimestamp("clockIn");
             if (clockInTimestamp != null) {
@@ -74,4 +74,13 @@ public class ShiftDao {
 
         namedParameterJdbcTemplate.update(sql, params);
     }
+
+    public void removeShift(String shiftId) {
+        String deleteSql = "DELETE FROM Shifts WHERE shiftId = :shiftId";
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("shiftId", shiftId);
+        namedParameterJdbcTemplate.update(deleteSql, parameters);
+    }
+
+
 }

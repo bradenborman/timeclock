@@ -1,0 +1,11 @@
+.shift-row {
+    .badge {
+        display: none;
+    }
+
+    &:hover {
+        .badge {
+            display: inline;
+        }
+    }
+}

@@ -51,4 +51,10 @@ public class ApiController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/shift/{shiftId}")
+    public ResponseEntity<Void> removeShift(@PathVariable String shiftId) {
+        timeclockService.removeShift(shiftId);
+        return ResponseEntity.ok().build();
+    }
+
 }

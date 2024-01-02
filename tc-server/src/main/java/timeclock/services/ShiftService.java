@@ -28,7 +28,7 @@ public class ShiftService {
     }
 
     public String clockOutShift(Shift shift) {
-        logger.info("{} is clocking out. Worked [{} - {}]", shift.getUserName(), shift.getClockIn(), shift.getClockOut());
+        logger.info("{} is clocking out. Worked [{} - {}]", shift.getName(), shift.getClockIn(), shift.getClockOut());
         String timeWorked = TimeCalculatorUtility.calculateTimeSpent(shift.getClockIn(), shift.getClockOut());
         shiftDao.clockOutShift(shift.getShiftId(), DateUtility.now(), timeWorked);
         return timeWorked;
@@ -38,5 +38,10 @@ public class ShiftService {
         shiftDao.insertNewShift(user, DateUtility.now());
     }
 
+
+    public void removeShift(String shiftId) {
+        logger.info("Deleting shift: {}", shiftId);
+        shiftDao.removeShift(shiftId);
+    }
 
 }
