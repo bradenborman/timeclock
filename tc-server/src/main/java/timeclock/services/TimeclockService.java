@@ -51,7 +51,8 @@ public class TimeclockService {
     }
 
     public void recordNewNote(String note) {
-        noteService.recordNewNote(note);
+        if(note != null && !note.isEmpty())
+            noteService.recordNewNote(note);
     }
 
     public void removeShift(String shiftId) {
