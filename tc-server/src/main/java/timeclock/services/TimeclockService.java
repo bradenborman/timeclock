@@ -6,6 +6,9 @@ import timeclock.models.Shift;
 import timeclock.models.User;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -38,7 +41,12 @@ public class TimeclockService {
     }
 
     public List<Shift> findShiftsByDate(String date) {
-       return shiftService.findShiftsByDate(LocalDate.parse(date));
+        // Parse the date normally first
+        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
+        ZonedDateTime utcDateTime = localDate.atStartOfDay(ZoneId.of("UTC"));
+        ZonedDateTime centralDateTime = utcDateTime.withZoneSameInstant(ZoneId.of("America/Chicago"));
+        LocalDate centralDate = centralDateTime.toLocalDate();
+        return shiftService.findShiftsByDate(centralDate);
     }
 
     @Transactional

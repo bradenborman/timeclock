@@ -9,8 +9,6 @@ import timeclock.models.User;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -37,24 +35,16 @@ public class ShiftDao {
             shift.setUserId(rs.getString("userId"));
             shift.setUserName(rs.getString("name"));
 
-            // Define the zone IDs for UTC and Central Time
-            ZoneId utcZoneId = ZoneId.of("UTC");
-            ZoneId centralZoneId = ZoneId.of("America/Chicago");
-
-            // Convert clockIn from UTC to Central Time
             Timestamp clockInTimestamp = rs.getTimestamp("clockIn");
             if (clockInTimestamp != null) {
-                LocalDateTime utcClockIn = clockInTimestamp.toLocalDateTime();
-                ZonedDateTime centralClockIn = utcClockIn.atZone(utcZoneId).withZoneSameInstant(centralZoneId);
-                shift.setClockIn(centralClockIn.format(formatter));
+                LocalDateTime clockIn = clockInTimestamp.toLocalDateTime();
+                shift.setClockIn(clockIn.format(formatter));
             }
 
-            // Convert clockOut from UTC to Central Time
             Timestamp clockOutTimestamp = rs.getTimestamp("clockOut");
             if (clockOutTimestamp != null) {
-                LocalDateTime utcClockOut = clockOutTimestamp.toLocalDateTime();
-                ZonedDateTime centralClockOut = utcClockOut.atZone(utcZoneId).withZoneSameInstant(centralZoneId);
-                shift.setClockOut(centralClockOut.format(formatter));
+                LocalDateTime clockOut = clockOutTimestamp.toLocalDateTime();
+                shift.setClockIn(clockOut.format(formatter));
             }
 
             shift.setTimeWorked(rs.getString("timeWorked"));
@@ -62,13 +52,14 @@ public class ShiftDao {
         });
     }
 
-    public void insertNewShift(User user) {
+    public void insertNewShift(User user, Timestamp clockInTimestamp) {
         String sql = "INSERT INTO Shifts (userId, name, clockIn, clockOut, timeWorked) " +
-                "VALUES (:userId, :name, CURRENT_TIMESTAMP, NULL, NULL)";
+                "VALUES (:userId, :name, :clockIn, NULL, NULL)";
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("userId", user.getUserId());
         params.addValue("name", user.getName());
+        params.addValue("clockIn", clockInTimestamp);
 
         namedParameterJdbcTemplate.update(sql, params);
     }

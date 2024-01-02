@@ -34,14 +34,14 @@ public class ShiftService {
     public String clockOutShift(Shift shift) {
         logger.info("{} is clocking out. Worked [{} - {}]", shift.getUserName(), shift.getClockIn(), shift.getClockOut());
         String timeWorked = TimeCalculatorUtility.calculateTimeSpent(shift.getClockIn(), shift.getClockOut());
-        shiftDao.clockOutShift(shift.getShiftId(), getTimestamp(shift), timeWorked);
+        shiftDao.clockOutShift(shift.getShiftId(), getTimestamp(shift.getClockOut()), timeWorked);
 
         return timeWorked;
     }
 
-    private static Timestamp getTimestamp(Shift shift) {
+    private static Timestamp getTimestamp(String clockTime) {
         try {
-            Instant instant = new SimpleDateFormat("h:mm a").parse(shift.getClockOut()).toInstant();
+            Instant instant = new SimpleDateFormat("h:mm a").parse(clockTime).toInstant();
 
             ZonedDateTime centralClockOut = instant.atZone(ZoneId.of("America/Chicago"));
             ZonedDateTime utcClockOut = centralClockOut.withZoneSameInstant(ZoneId.of("UTC"));
@@ -52,6 +52,8 @@ public class ShiftService {
     }
 
     public void startNewShift(User user) {
-        shiftDao.insertNewShift(user);
+        shiftDao.insertNewShift(user,
+                Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Chicago")).toInstant())
+        );
     }
 }
