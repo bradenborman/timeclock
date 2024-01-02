@@ -35,4 +35,19 @@ public class EmailService {
         javaMailSender.send(message);
     }
 
+    public void sendWorksheetEmailTest() {
+        String[] receivingAddress =  new String[] {"bradenborman00@gmail.com"};
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(receivingAddress);
+            helper.setSubject("TEST EMAIL");
+            helper.setText("This is just a test", false);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send email!", e);
+        }
+
+        javaMailSender.send(message);
+    }
 }
