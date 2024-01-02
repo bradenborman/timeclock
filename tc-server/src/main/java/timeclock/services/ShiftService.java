@@ -9,8 +9,6 @@ import timeclock.models.User;
 import timeclock.utilities.TimeCalculatorUtility;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -34,26 +32,16 @@ public class ShiftService {
     public String clockOutShift(Shift shift) {
         logger.info("{} is clocking out. Worked [{} - {}]", shift.getUserName(), shift.getClockIn(), shift.getClockOut());
         String timeWorked = TimeCalculatorUtility.calculateTimeSpent(shift.getClockIn(), shift.getClockOut());
-        shiftDao.clockOutShift(shift.getShiftId(), getTimestamp(shift.getClockOut()), timeWorked);
-
+        shiftDao.clockOutShift(shift.getShiftId(), now(), timeWorked);
         return timeWorked;
     }
 
-    private static Timestamp getTimestamp(String clockTime) {
-        try {
-            Instant instant = new SimpleDateFormat("h:mm a").parse(clockTime).toInstant();
-
-            ZonedDateTime centralClockOut = instant.atZone(ZoneId.of("America/Chicago"));
-            ZonedDateTime utcClockOut = centralClockOut.withZoneSameInstant(ZoneId.of("UTC"));
-            return Timestamp.from(utcClockOut.toInstant());
-        } catch (Exception e) {
-            return Timestamp.from(Instant.now());
-        }
-    }
-
     public void startNewShift(User user) {
-        shiftDao.insertNewShift(user,
-                Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Chicago")).toInstant())
-        );
+        shiftDao.insertNewShift(user, now());
     }
+
+    private Timestamp now() {
+        return Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Chicago")).toInstant());
+    }
+
 }
