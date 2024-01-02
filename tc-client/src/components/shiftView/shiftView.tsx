@@ -28,7 +28,7 @@ const ShiftView: React.FC = () => {
             if (newestUser) {
                 navigate(location.pathname, { state: { ...restState }, replace: true });
             }
-        }, 3000);
+        }, 3000);0
         return () => clearTimeout(timer);
     }, [location, navigate]);
 

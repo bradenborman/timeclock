@@ -16,11 +16,13 @@ public class TimeclockService {
 
     private final UserService userService;
     private final ShiftService shiftService;
+    private final NoteService noteService;
     private final EmailService emailService;
 
-    public TimeclockService(UserService userService, ShiftService shiftService, EmailService emailService) {
+    public TimeclockService(UserService userService, ShiftService shiftService, NoteService noteService, EmailService emailService) {
         this.userService = userService;
         this.shiftService = shiftService;
+        this.noteService = noteService;
         this.emailService = emailService;
     }
 
@@ -52,5 +54,9 @@ public class TimeclockService {
     @Transactional
     public String clockOutShift(Shift shift) {
         return shiftService.clockOutShift(shift);
+    }
+
+    public void recordNewNote(String note) {
+        noteService.recordNewNote(note);
     }
 }

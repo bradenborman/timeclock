@@ -45,4 +45,10 @@ public class ApiController {
             return ResponseEntity.ok().body(timeclockService.clockOutShift(shift));
     }
 
+    @PostMapping("/note")
+    public ResponseEntity<Void> note(@RequestBody String note) {
+        timeclockService.recordNewNote(note);
+        return ResponseEntity.ok().build();
+    }
+
 }

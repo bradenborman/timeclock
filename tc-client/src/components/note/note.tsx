@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -6,8 +7,14 @@ const Note: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault(); // Prevent the default form submit action
-        alert('Note Submitted: ' + note); // Placeholder action to demonstrate submission
-        setNote(''); // Clear the note after submission
+        axios.post('/api/note', note)
+            .then(response => {
+                setNote('');
+                alert("Note was submitted! Thank you")
+            })
+            .catch(error => {
+                console.error('There was an error submitting the note:', error);
+            });
     };
 
     return (
