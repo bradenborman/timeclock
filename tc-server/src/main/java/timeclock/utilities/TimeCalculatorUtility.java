@@ -2,6 +2,8 @@ package timeclock.utilities;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class TimeCalculatorUtility {
@@ -30,4 +32,13 @@ public class TimeCalculatorUtility {
         }
     }
 
+    public static String calculateTimeSpent(LocalDateTime clockInTimeUpdated, LocalDateTime clockOutTimeUpdated) {
+        if(clockOutTimeUpdated == null)
+            return "";
+
+        Duration duration = Duration.between(clockInTimeUpdated, clockOutTimeUpdated);
+        long diffHours = duration.toHours();
+        long diffMinutes = duration.toMinutes() % 60;
+        return String.format("%dh %02dm", diffHours, diffMinutes);
+    }
 }

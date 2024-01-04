@@ -9,7 +9,9 @@ import timeclock.models.User;
 import timeclock.utilities.DateUtility;
 import timeclock.utilities.TimeCalculatorUtility;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -42,6 +44,15 @@ public class ShiftService {
     public void removeShift(String shiftId) {
         logger.info("Deleting shift: {}", shiftId);
         shiftDao.removeShift(shiftId);
+    }
+
+    public void updateShift(LocalDateTime clockInTimeUpdated, LocalDateTime clockOutTimeUpdated, String timeWorked, int shiftId) {
+        shiftDao.updateShift(
+                shiftId,
+                Timestamp.valueOf(clockInTimeUpdated),
+                clockOutTimeUpdated != null ? Timestamp.valueOf(clockOutTimeUpdated) : null,
+                timeWorked
+        );
     }
 
 }

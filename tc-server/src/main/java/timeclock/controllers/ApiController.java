@@ -37,8 +37,8 @@ public class ApiController {
     }
 
     @GetMapping("/shifts")
-    public ResponseEntity<List<Shift>> getAllShiftsStartedByDate(@RequestParam String date) {
-        return ResponseEntity.ok(timeclockService.findShiftsByDate(date));
+    public ResponseEntity<List<Shift>> getAllShiftsStartedByDate() {
+        return ResponseEntity.ok(timeclockService.findShiftsByDate());
     }
 
     @PostMapping("/clockout")
@@ -61,6 +61,12 @@ public class ApiController {
     public ResponseEntity<Void> removeShift(@PathVariable String shiftId) {
         timeclockService.removeShift(shiftId);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/shift")
+    public ResponseEntity<String> updateShift(@RequestBody Shift shift) {
+        String timeWorked = timeclockService.updateShift(shift);
+        return ResponseEntity.ok(timeWorked);
     }
 
 }

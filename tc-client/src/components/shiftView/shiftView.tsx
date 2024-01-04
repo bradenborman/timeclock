@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 import Toast from '../../components/toast/toast';
 
-interface Shift {
+export interface Shift {
     shiftId: number;
     userId: number;
     name: string;
@@ -13,6 +13,7 @@ interface Shift {
     clockOut: string;
     timeWorked?: string;  // Optional property for time worked
     isLoading?: boolean;
+    isEditing?: boolean;
 }
 
 const ShiftView: React.FC = () => {
@@ -34,7 +35,7 @@ const ShiftView: React.FC = () => {
 
 
     useEffect(() => {
-        axios.get(`/api/shifts?date=${new Date().toISOString().split('T')[0]}`)
+        axios.get(`/api/shifts`)
             .then(response => {
                 console.log(response.data)
                 setShifts(response.data);
@@ -90,21 +91,6 @@ const ShiftView: React.FC = () => {
             });
     };
 
-
-    const handleRowDelete = (shiftId: number) => {
-        if (confirm("Do you really want to delete this row? You cannot undo this action.")) {
-            axios.delete(`/api/shift/${shiftId}`)
-                .then(response => {
-                    const updatedShifts = shifts.filter(shift => shift.shiftId !== shiftId);
-                    setShifts(updatedShifts);
-                })
-                .catch(error => {
-                    console.error("There was an error deleting the row", error);
-                });
-        }
-    }
-
-
     const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
     return (
@@ -123,21 +109,26 @@ const ShiftView: React.FC = () => {
                         </Link>
                     </li>
                     <li className='mt-4'>
-                        <Link to="/note" className="text-md text-indigo-200 hover:text-indigo-100">
+                        <Link to="/note" className="text-lg text-indigo-200 hover:text-indigo-100">
                             📝 Leave a Note
+                        </Link>
+                    </li>
+                    <li className='mt-4'>
+                        <Link to="/admin" className="text-lg text-indigo-200 hover:text-indigo-100">
+                            👤 Admin
                         </Link>
                     </li>
                 </ul>
             </div>
             <div className="flex-1 ml-72 p-6 overflow-auto">
                 <div className="overflow-x-auto">
-                    <table className="table-auto w-full text-2xl">
+                    <table className="table-auto w-full text-xl">
                         <thead className="sticky top-0 bg-white">
                             <tr className="bg-gray-200">
                                 <th className="px-4 py-2 w-3/5 text-left">Name</th>
-                                <th className="px-4 py-2 min-w-[150px] w-[10%]">Time In</th>
-                                <th className="px-4 py-2 min-w-[150px] w-[10%]">Time Out</th>
-                                <th className="px-4 py-2 min-w-[150px] w-[10%] text-xl">⏱ Worked</th>
+                                <th className="px-4 py-2 min-w-[120px] w-[10%]">Time In</th>
+                                <th className="px-4 py-2 min-w-[120px] w-[10%]">Time Out</th>
+                                <th className="px-4 py-2 min-w-[130px] w-[10%] text-lg">⏱ Worked</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -145,11 +136,6 @@ const ShiftView: React.FC = () => {
                                 <tr key={shift.shiftId} className="text-center border-b border-gray-200 shift-row">
                                     <td className="px-4 py-3 text-left">
                                         {shift.name}
-                                        {shift.clockOut && ( // Only display this when shift.clockOut is set
-                                            <span className="float-right badge border border-red-500 bg-white text-black p-1 rounded text-xxs cursor-pointer" onDoubleClick={() => handleRowDelete(shift.shiftId)} style={{ lineHeight: '1', padding: '0.25rem 0.5rem' }}>
-                                                Double-click to remove row
-                                            </span>
-                                        )}
                                     </td>
                                     <td className="px-4 py-2">{shift.clockIn}</td>
                                     <td className="px-4 py-2">

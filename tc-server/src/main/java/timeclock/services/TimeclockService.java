@@ -6,8 +6,12 @@ import timeclock.models.Note;
 import timeclock.models.Shift;
 import timeclock.models.User;
 import timeclock.utilities.DateUtility;
+import timeclock.utilities.TimeCalculatorUtility;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -41,10 +45,8 @@ public class TimeclockService {
         shiftService.startNewShift(user);
     }
 
-    public List<Shift> findShiftsByDate(String date) {
-//        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
+    public List<Shift> findShiftsByDate() {
         LocalDate localDate = DateUtility.todayCentralTime();
-
         return shiftService.findShiftsByDate(localDate);
     }
 
@@ -64,5 +66,20 @@ public class TimeclockService {
 
     public List<Note> findAllNotes() {
        return noteService.findAllNotes();
+    }
+
+
+    public String updateShift(Shift shift) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
+
+        LocalDateTime clockInTimeUpdated = LocalDateTime.of(DateUtility.todayCentralTime(), LocalTime.parse(shift.getClockIn().trim(), formatter));
+        LocalDateTime clockOutTimeUpdated = shift.getClockOut() != null ?
+                LocalDateTime.of(DateUtility.todayCentralTime(), LocalTime.parse(shift.getClockOut().trim(), formatter)) : null;
+
+        String timeWorked = TimeCalculatorUtility.calculateTimeSpent(clockInTimeUpdated, clockOutTimeUpdated);
+
+        shiftService.updateShift(clockInTimeUpdated, clockOutTimeUpdated, timeWorked, shift.getShiftId());
+
+        return timeWorked;
     }
 }
