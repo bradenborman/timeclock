@@ -36,9 +36,13 @@ public class TimeCalculatorUtility {
         if(clockOutTimeUpdated == null)
             return "";
 
-        Duration duration = Duration.between(clockInTimeUpdated, clockOutTimeUpdated);
-        long diffHours = duration.toHours();
-        long diffMinutes = duration.toMinutes() % 60;
-        return String.format("%dh %02dm", diffHours, diffMinutes);
+        if(clockInTimeUpdated.isBefore(clockOutTimeUpdated)) {
+            Duration duration = Duration.between(clockInTimeUpdated, clockOutTimeUpdated);
+            long diffHours = duration.toHours();
+            long diffMinutes = duration.toMinutes() % 60;
+            return String.format("%dh %02dm", diffHours, diffMinutes);
+        }
+
+        throw new RuntimeException("Invalid - Clock out before clock in");
     }
 }

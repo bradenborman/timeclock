@@ -73,7 +73,7 @@ public class TimeclockService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
 
         LocalDateTime clockInTimeUpdated = LocalDateTime.of(DateUtility.todayCentralTime(), LocalTime.parse(shift.getClockIn().trim(), formatter));
-        LocalDateTime clockOutTimeUpdated = shift.getClockOut() != null ?
+        LocalDateTime clockOutTimeUpdated = shift.getClockOut() != null && !shift.getClockOut().isEmpty() ?
                 LocalDateTime.of(DateUtility.todayCentralTime(), LocalTime.parse(shift.getClockOut().trim(), formatter)) : null;
 
         String timeWorked = TimeCalculatorUtility.calculateTimeSpent(clockInTimeUpdated, clockOutTimeUpdated);

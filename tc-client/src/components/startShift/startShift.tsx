@@ -167,7 +167,7 @@ const StartShift: React.FC = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label htmlFor="paymentMethod" className="text-gray-700 font-semibold">💳 Payment method</label>
+                                <label htmlFor="paymentMethod" className="text-gray-700 font-semibold">📫 Physical Mailing Address</label>
                                 <input
                                     required
                                     type="text"
@@ -175,7 +175,7 @@ const StartShift: React.FC = () => {
                                     value={paymentMethod}
                                     onChange={(e) => setPaymentMethod(e.target.value)}
                                     className="form-input mt-1 p-1 block w-full border border-gray-300 focus:border-blue-500"
-                                    placeholder="EX: Venmo: @username / TBD"
+                                    placeholder=""
                                     autoComplete="off"
                                 />
                             </div>
