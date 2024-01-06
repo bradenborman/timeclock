@@ -23,8 +23,8 @@ public class EmailService {
     public void sendWorksheetEmail(ByteArrayResource file, List<Note> notes) {
         String[] receivingAddress =  new String[] {
                 "bradenborman00@gmail.com",
-//                "amyatkinson19@hotmail.com",
-//                "mike@thecandyfactory.biz"
+                "amyatkinson19@hotmail.com",
+                "mike@thecandyfactory.biz"
         };
 
         MimeMessage message = javaMailSender.createMimeMessage();
