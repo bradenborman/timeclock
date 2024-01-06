@@ -42,7 +42,6 @@ const StartShift: React.FC = () => {
             });
     }, []);
 
-
     const handleUserStatusChange = (status: UserStatus) => {
         setUserStatus(status);
     };
@@ -177,6 +176,11 @@ const StartShift: React.FC = () => {
                                     className="form-input mt-1 p-1 block w-full border border-gray-300 focus:border-blue-500"
                                     placeholder=""
                                     autoComplete="off"
+                                    onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                                        if (event.key === 'Enter') {
+                                            event.preventDefault();
+                                        }
+                                    }}
                                 />
                             </div>
                             <button
