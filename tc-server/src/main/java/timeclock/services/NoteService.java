@@ -5,6 +5,7 @@ import timeclock.daos.NotesDao;
 import timeclock.models.Note;
 import timeclock.utilities.DateUtility;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -22,5 +23,9 @@ public class NoteService {
 
     public List<Note> findAllNotes() {
         return notesDao.selectAllNotes();
+    }
+
+    public List<Note> findAllNotes(LocalDate today) {
+        return notesDao.selectAllNotes(today);
     }
 }

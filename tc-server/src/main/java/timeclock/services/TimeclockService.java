@@ -93,9 +93,10 @@ public class TimeclockService {
 
 
     public void sendDailySummaryEmail() {
+        List<Note> notes = noteService.findAllNotes(DateUtility.todayCentralTime());
         List<UserShiftRow> userShifts = shiftService.retrieveUserShiftsToday();
         ByteArrayResource excelDocument = new WorkSheetBuilder().populateWorkbook(userShifts).toFile();
-        emailService.sendWorksheetEmail(excelDocument);
+        emailService.sendWorksheetEmail(excelDocument, notes);
         logger.info("Daily Summary Email sent");
     }
 
