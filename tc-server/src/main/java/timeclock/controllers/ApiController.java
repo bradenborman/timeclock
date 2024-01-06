@@ -69,4 +69,11 @@ public class ApiController {
         return ResponseEntity.ok(timeWorked);
     }
 
+
+    @GetMapping("/email/send")
+    public ResponseEntity<Void> sendEmail() {
+        timeclockService.sendDailySummaryEmail();
+        return ResponseEntity.ok().build();
+    }
+
 }

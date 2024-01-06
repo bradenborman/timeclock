@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import timeclock.daos.ShiftDao;
 import timeclock.models.Shift;
 import timeclock.models.User;
+import timeclock.models.UserShiftRow;
 import timeclock.utilities.DateUtility;
 import timeclock.utilities.TimeCalculatorUtility;
 
@@ -55,4 +56,7 @@ public class ShiftService {
         );
     }
 
+    public List<UserShiftRow> retrieveUserShiftsToday() {
+       return shiftDao.selectUserShiftRowsByDate(DateUtility.todayCentralTime());
+    }
 }

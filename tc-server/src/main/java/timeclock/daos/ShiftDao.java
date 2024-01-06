@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import timeclock.models.Shift;
 import timeclock.models.User;
+import timeclock.models.UserShiftRow;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -95,5 +96,42 @@ public class ShiftDao {
         namedParameterJdbcTemplate.update(sql, params);
     }
 
+    public List<UserShiftRow> selectUserShiftRowsByDate(LocalDate date) {
+        String sql = "SELECT Shifts.*, Users.phoneNumber, Users.email, Users.paymentMethod " +
+                "FROM Shifts " +
+                "JOIN Users ON Shifts.userId = Users.userId " +
+                "WHERE DATE(Shifts.clockIn) = :clockInDate";
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("clockInDate", date);
+
+        return namedParameterJdbcTemplate.query(sql, params, (rs, rowNum) -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
+            UserShiftRow shift = new UserShiftRow();
+            shift.setShiftId(rs.getInt("shiftId"));
+            shift.setUserId(rs.getString("userId"));
+            shift.setName(rs.getString("name"));
+
+            // Retrieve and set additional fields from the Users table
+            shift.setPhoneNumber(rs.getString("phoneNumber"));
+            shift.setEmail(rs.getString("email"));
+            shift.setMailingAddress(rs.getString("paymentMethod"));
+
+            Timestamp clockInTimestamp = rs.getTimestamp("clockIn");
+            if (clockInTimestamp != null) {
+                LocalDateTime clockIn = clockInTimestamp.toLocalDateTime();
+                shift.setClockIn(clockIn.format(formatter));
+            }
+
+            Timestamp clockOutTimestamp = rs.getTimestamp("clockOut");
+            if (clockOutTimestamp != null) {
+                LocalDateTime clockOut = clockOutTimestamp.toLocalDateTime();
+                shift.setClockOut(clockOut.format(formatter));
+            }
+
+            shift.setTimeWorked(rs.getString("timeWorked"));
+            return shift;
+        });
+    }
 
 }

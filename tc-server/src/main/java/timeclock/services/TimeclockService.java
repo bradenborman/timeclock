@@ -1,12 +1,17 @@
 package timeclock.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import timeclock.models.Note;
 import timeclock.models.Shift;
 import timeclock.models.User;
+import timeclock.models.UserShiftRow;
 import timeclock.utilities.DateUtility;
 import timeclock.utilities.TimeCalculatorUtility;
+import timeclock.utilities.WorkSheetBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,8 +19,11 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+
 @Service
 public class TimeclockService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TimeclockService.class);
 
     private final UserService userService;
     private final ShiftService shiftService;
@@ -82,4 +90,14 @@ public class TimeclockService {
 
         return timeWorked;
     }
+
+
+    public void sendDailySummaryEmail() {
+        List<UserShiftRow> userShifts = shiftService.retrieveUserShiftsToday();
+        ByteArrayResource excelDocument = new WorkSheetBuilder().populateWorkbook(userShifts).toFile();
+        emailService.sendWorksheetEmail(excelDocument);
+        logger.info("Daily Summary Email sent");
+    }
+
+
 }

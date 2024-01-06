@@ -13,6 +13,10 @@ const Admin: React.FC = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [shifts, setShifts] = useState<Shift[]>([]);
 
+    const [sendingEmailLoading, setSendingEmailLoading] = useState(false);
+
+
+
     useEffect(() => {
         setIsAuthenticated(false);
 
@@ -93,6 +97,17 @@ const Admin: React.FC = () => {
         }
     };
 
+    const triggerEmail = (): void => {
+        setSendingEmailLoading(true)
+        axios.get('/api/email/send')
+            .then(response => {
+                setSendingEmailLoading(false)
+            })
+            .catch(error => {
+                console.error('Error updating shift:', error);
+            });
+    }
+
 
     return (
         <div className="bg-gray-100 min-h-screen">
@@ -110,6 +125,12 @@ const Admin: React.FC = () => {
             ) : (
                 <div className="flex justify-center items-center min-h-screen">
                     <div className="container mx-auto p-5 w-full max-w-4xl bg-white shadow-lg rounded" style={{ maxHeight: '700px', overflowY: 'auto' }}>
+                        <button
+                            className={`bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded mb-3 float-right ${sendingEmailLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            onClick={e => triggerEmail()}
+                        >
+                            {sendingEmailLoading ? 'Sending...' : '📧 Send Email'}
+                        </button>
                         <table className="table-auto w-full text-left">
                             <thead>
                                 <tr className="bg-gray-200">

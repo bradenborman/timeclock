@@ -4,6 +4,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import timeclock.utilities.DateUtility;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -18,16 +19,19 @@ public class EmailService {
     }
 
     public void sendWorksheetEmail(ByteArrayResource file) {
-        String[] receivingAddress =  new String[] {"bradenborman00@gmail.com",
-//                "amyatkinson19@hotmail.com", "mike@thecandyfactory.biz"
+        String[] receivingAddress =  new String[] {
+                "bradenborman00@gmail.com",
+                "amyatkinson19@hotmail.com",
+                "mike@thecandyfactory.biz"
         };
+
         MimeMessage message = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             helper.setTo(receivingAddress);
-            helper.setSubject("Today's Timesheet [DRY RUN]");
-            helper.setText("<p>This is just a test to verify email account connection</p>", true);
-            helper.addAttachment("todaystimesheet.xlsx", file);
+            helper.setSubject(DateUtility.formatTodayDateForFileName() + " Timesheet");
+            helper.setText("<p>Attached is today's Time-clock</p>", true);
+            helper.addAttachment(DateUtility.formatTodayDateForFileName() + "-timesheet.xlsx", file);
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to send email!", e);
         }
@@ -35,19 +39,4 @@ public class EmailService {
         javaMailSender.send(message);
     }
 
-    public void sendWorksheetEmailTest() {
-        String[] receivingAddress =  new String[] {"bradenborman00@gmail.com"};
-        MimeMessage message = javaMailSender.createMimeMessage();
-
-        try {
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setTo(receivingAddress);
-            helper.setSubject("TEST EMAIL");
-            helper.setText("This is just a test", false);
-        } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send email!", e);
-        }
-
-        javaMailSender.send(message);
-    }
 }
