@@ -1,12 +1,22 @@
 package timeclock.utilities;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 public class DateUtility {
+
+    public static long timeSpentInMinutes(String clockIn, String clockOut) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
+            LocalTime clockInTime = LocalTime.parse(clockIn, formatter);
+            LocalTime clockOutTime = LocalTime.parse(clockOut, formatter);
+            return Duration.between(clockInTime, clockOutTime).toMinutes();
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
 
     public static Timestamp now() {
         return Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Chicago")).toInstant());

@@ -35,7 +35,7 @@ public class WorkSheetBuilder {
         Row headerRow = sheet.createRow(0);
 
         // Creating header cells and setting the header names
-        String[] columns = {"Full Name", "Phone Number", "Email", "Mailing Address", "Clocked In", "Clocked Out", "Time Worked"};
+        String[] columns = {"Full Name", "Phone Number", "Email", "Mailing Address", "Clocked In", "Clocked Out", "Time Worked", "Total Mins Worked"};
         for (int i = 0; i < columns.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(columns[i]);
@@ -54,6 +54,7 @@ public class WorkSheetBuilder {
             row.createCell(4).setCellValue(usr.getClockIn());
             row.createCell(5).setCellValue(usr.getClockOut());
             row.createCell(6).setCellValue(usr.getTimeWorked());
+            row.createCell(7).setCellValue(String.valueOf(DateUtility.timeSpentInMinutes(usr.getClockIn(), usr.getClockOut())));
         }
 
         // Resize all columns to fit the content size
