@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import timeclock.daos.UserDao;
 import timeclock.models.User;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -16,7 +17,9 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        return userDao.selectAllUsers();
+        List<User> users = userDao.selectAllUsers();
+        users.sort(Comparator.comparing(User::getName));
+        return users;
     }
 
     public void insertUser(User user) {
