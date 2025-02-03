@@ -6,7 +6,7 @@ public class User {
     private String name;
     private String phoneNumber;
     private String email;
-    private String paymentMethod;
+    private String physicalMailingAddress;
 
     public String getUserId() {
         return userId;
@@ -40,11 +40,11 @@ public class User {
         this.email = email;
     }
 
-    public String getPaymentMethod() {
-        return paymentMethod;
+    public String getPhysicalMailingAddress() {
+        return physicalMailingAddress;
     }
 
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
+    public void setPhysicalMailingAddress(String physicalMailingAddress) {
+        this.physicalMailingAddress = physicalMailingAddress;
     }
 }

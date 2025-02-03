@@ -97,7 +97,7 @@ public class ShiftDao {
     }
 
     public List<UserShiftRow> selectUserShiftRowsByDate(LocalDate date) {
-        String sql = "SELECT Shifts.*, Users.phoneNumber, Users.email, Users.paymentMethod " +
+        String sql = "SELECT Shifts.*, Users.phoneNumber, Users.email, Users.physicalMailingAddress " +
                 "FROM Shifts " +
                 "JOIN Users ON Shifts.userId = Users.userId " +
                 "WHERE DATE(Shifts.clockIn) = :clockInDate";
@@ -115,7 +115,7 @@ public class ShiftDao {
             // Retrieve and set additional fields from the Users table
             shift.setPhoneNumber(rs.getString("phoneNumber"));
             shift.setEmail(rs.getString("email"));
-            shift.setMailingAddress(rs.getString("paymentMethod"));
+            shift.setMailingAddress(rs.getString("physicalMailingAddress"));
 
             Timestamp clockInTimestamp = rs.getTimestamp("clockIn");
             if (clockInTimestamp != null) {

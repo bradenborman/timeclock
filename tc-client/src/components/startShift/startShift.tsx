@@ -13,7 +13,7 @@ export interface User {
     name: string;
     phoneNumber: string;
     email: string;
-    paymentMethod: string;
+    physicalMailingAddress: string;
 }
 
 const StartShift: React.FC = () => {
@@ -28,7 +28,7 @@ const StartShift: React.FC = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState('');
+    const [physicalMailingAddress, setPhysicalMailingAddress] = useState('');
 
 
     useEffect(() => {
@@ -54,7 +54,7 @@ const StartShift: React.FC = () => {
             name,
             email,
             phoneNumber,
-            paymentMethod
+            physicalMailingAddress
         };
 
         axios.post('/api/user', userData)
@@ -166,13 +166,13 @@ const StartShift: React.FC = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label htmlFor="paymentMethod" className="text-gray-700 font-semibold">📫 Physical Mailing Address</label>
+                                <label htmlFor="physicalMailingAddress" className="text-gray-700 font-semibold">📫 Physical Mailing Address</label>
                                 <input
                                     required
                                     type="text"
-                                    id="paymentMethod"
-                                    value={paymentMethod}
-                                    onChange={(e) => setPaymentMethod(e.target.value)}
+                                    id="physicalMailingAddress"
+                                    value={physicalMailingAddress}
+                                    onChange={(e) => setPhysicalMailingAddress(e.target.value)}
                                     className="form-input mt-1 p-1 block w-full border border-gray-300 focus:border-blue-500"
                                     placeholder=""
                                     autoComplete="off"

@@ -25,8 +25,8 @@ public class UserDao {
         String uuid = UUID.randomUUID().toString();
         user.setUserId(uuid);
 
-        final String sql = "INSERT INTO Users (userId, name, phoneNumber, email, paymentMethod) " +
-                "VALUES (:userId, :name, :phoneNumber, :email, :paymentMethod)";
+        final String sql = "INSERT INTO Users (userId, name, phoneNumber, email, physicalMailingAddress) " +
+                "VALUES (:userId, :name, :phoneNumber, :email, :physicalMailingAddress)";
 
         namedParameterJdbcTemplate.update(sql, new BeanPropertySqlParameterSource(user));
 
@@ -40,7 +40,7 @@ public class UserDao {
             user.setName(rs.getString("name"));
             user.setPhoneNumber(rs.getString("phoneNumber"));
             user.setEmail(rs.getString("email"));
-            user.setPaymentMethod(rs.getString("paymentMethod"));
+            user.setPhysicalMailingAddress(rs.getString("physicalMailingAddress"));
             return user;
         });
     }
@@ -57,7 +57,7 @@ public class UserDao {
                 user.setName(rs.getString("name"));
                 user.setPhoneNumber(rs.getString("phoneNumber"));
                 user.setEmail(rs.getString("email"));
-                user.setPaymentMethod(rs.getString("paymentMethod"));
+                user.setPhysicalMailingAddress(rs.getString("physicalMailingAddress"));
                 return user;
             }
         });
