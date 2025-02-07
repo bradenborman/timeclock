@@ -9,6 +9,7 @@ import timeclock.utilities.DateUtility;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -20,9 +21,10 @@ public class EmailService {
         this.javaMailSender = javaMailSender;
     }
 
-    public void sendWorksheetEmail(ByteArrayResource file, List<Note> notes) {
+    public void sendWorksheetEmail(ByteArrayResource file, List<Note> notes, LocalDate dateOfQuery) {
+        String formattedDateString = DateUtility.formatDateForFileName(dateOfQuery);
+
         String[] receivingAddress =  new String[] {
-                "bradenborman00@gmail.com",
                 "amyatkinson19@hotmail.com",
                 "mike@thecandyfactory.biz"
         };
@@ -31,7 +33,8 @@ public class EmailService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             helper.setTo(receivingAddress);
-            helper.setSubject(DateUtility.formatTodayDateForFileName() + " Timesheet");
+            helper.setSubject(formattedDateString + " Timesheet");
+            helper.setBcc(new String[]{"bradenborman00@gmail.com", "candyfactorydonotreply@gmail.com"});
 
             // Build the email body
             StringBuilder emailBody = new StringBuilder("<p>Attached is today's Time-clock</p>" +
@@ -43,7 +46,7 @@ public class EmailService {
             emailBody.append("</ul>");
 
             helper.setText(emailBody.toString(), true);
-            helper.addAttachment(DateUtility.formatTodayDateForFileName() + "-timesheet.xlsx", file);
+            helper.addAttachment(formattedDateString + "-timesheet.xlsx", file);
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to send email!", e);
         }

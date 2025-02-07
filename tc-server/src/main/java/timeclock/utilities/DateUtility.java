@@ -32,6 +32,10 @@ public class DateUtility {
         return now.format(DateTimeFormatter.ofPattern("MMM")) + getDayOfMonthSuffix(now.getDayOfMonth()) + now.format(DateTimeFormatter.ofPattern("yyyy"));
     }
 
+    public static String formatDateForFileName(LocalDate localDate) {
+        return localDate.format(DateTimeFormatter.ofPattern("MMM")) + getDayOfMonthSuffix(localDate.getDayOfMonth()) + localDate.format(DateTimeFormatter.ofPattern("yyyy"));
+    }
+
     private static String getDayOfMonthSuffix(int day) {
         if (day >= 11 && day <= 13) {
             return day + "th";

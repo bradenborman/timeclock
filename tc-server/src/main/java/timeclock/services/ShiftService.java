@@ -59,4 +59,8 @@ public class ShiftService {
     public List<UserShiftRow> retrieveUserShiftsToday() {
        return shiftDao.selectUserShiftRowsByDate(DateUtility.todayCentralTime());
     }
+
+    public List<UserShiftRow> retrieveUserShifts(LocalDate localDate) {
+        return shiftDao.selectUserShiftRowsByDate(localDate);
+    }
 }

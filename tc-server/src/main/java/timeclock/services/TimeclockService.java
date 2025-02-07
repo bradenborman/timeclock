@@ -93,11 +93,20 @@ public class TimeclockService {
 
 
     public void sendDailySummaryEmail() {
-        List<Note> notes = noteService.findAllNotes(DateUtility.todayCentralTime());
+        LocalDate today = DateUtility.todayCentralTime();
+        List<Note> notes = noteService.findAllNotes(today);
         List<UserShiftRow> userShifts = shiftService.retrieveUserShiftsToday();
         ByteArrayResource excelDocument = new WorkSheetBuilder().populateWorkbook(userShifts).toFile();
-        emailService.sendWorksheetEmail(excelDocument, notes);
+        emailService.sendWorksheetEmail(excelDocument, notes, today);
         logger.info("Daily Summary Email sent");
+    }
+
+    public void sendDailySummaryEmail(LocalDate localDate) {
+        List<Note> notes = noteService.findAllNotes(localDate);
+        List<UserShiftRow> userShifts = shiftService.retrieveUserShifts(localDate);
+        ByteArrayResource excelDocument = new WorkSheetBuilder().populateWorkbook(userShifts).toFile();
+        emailService.sendWorksheetEmail(excelDocument, notes, localDate);
+        logger.info("Summary Email sent for {}", localDate.format(DateTimeFormatter.ISO_DATE));
     }
 
 
