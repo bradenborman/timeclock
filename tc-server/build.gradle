@@ -1,36 +1,37 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '2.7.10-SNAPSHOT'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'org.springframework.boot' version '3.4.1'
+	id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'candyfactory'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '1.8'
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
 }
+
 repositories {
 	mavenCentral()
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 	//DB Driver
-	implementation 'mysql:mysql-connector-java:8.0.23'
+	implementation 'com.mysql:mysql-connector-j'
 
 	//Excel document
-	implementation 'org.apache.poi:poi:5.2.0'
-	implementation 'org.apache.poi:poi-ooxml:5.2.0'
+	implementation 'org.apache.poi:poi:5.3.0'
+	implementation 'org.apache.poi:poi-ooxml:5.3.0'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
@@ -63,10 +64,12 @@ task finalizeBuild(type: Copy) {
 	dependsOn 'build'
 
 	println "Renaming jar.."
-	from "${buildDir}/libs/tc-server-${version}.jar"
-	into "${buildDir}/libs"
+	from layout.buildDirectory.file("libs/tc-server-${version}.jar")
+	into layout.buildDirectory.dir("libs")
 	rename "tc-server-${version}.jar", "timeclock.jar"
-	delete "tc-server-${version}.jar"
+	doLast {
+		delete layout.buildDirectory.file("libs/tc-server-${version}.jar")
+	}
 }
 
 processResources.dependsOn(copyClient)

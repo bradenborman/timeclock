@@ -7,10 +7,11 @@ import org.springframework.stereotype.Service;
 import timeclock.models.Note;
 import timeclock.utilities.DateUtility;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.time.LocalDate;
 import java.util.List;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class EmailService {
