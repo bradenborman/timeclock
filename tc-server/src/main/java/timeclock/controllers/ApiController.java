@@ -1,5 +1,6 @@
 package timeclock.controllers;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import timeclock.models.Note;
@@ -8,15 +9,26 @@ import timeclock.models.User;
 import timeclock.services.TimeclockService;
 
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/api")
 @RestController
 public class ApiController {
 
     private final TimeclockService timeclockService;
+    
+    @Value("${admin.password}")
+    private String adminPassword;
 
     public ApiController(TimeclockService timeclockService) {
         this.timeclockService = timeclockService;
+    }
+
+    @PostMapping("/admin/validate")
+    public ResponseEntity<Map<String, Boolean>> validateAdminPassword(@RequestBody Map<String, String> request) {
+        String password = request.get("password");
+        boolean isValid = adminPassword.equals(password);
+        return ResponseEntity.ok(Map.of("valid", isValid));
     }
 
     @GetMapping("/users")

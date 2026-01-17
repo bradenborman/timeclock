@@ -13,6 +13,7 @@ import java.util.List;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
+
 @Service
 public class EmailService {
 

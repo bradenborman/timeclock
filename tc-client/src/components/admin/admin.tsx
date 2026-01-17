@@ -33,9 +33,20 @@ const Admin: React.FC = () => {
 
     const handlePasswordSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (password === 'cherry') {
-            setIsAuthenticated(true);
-        }
+        
+        axios.post('/api/admin/validate', { password })
+            .then(response => {
+                if (response.data.valid) {
+                    setIsAuthenticated(true);
+                } else {
+                    alert('Invalid password');
+                    setPassword('');
+                }
+            })
+            .catch(error => {
+                console.error('Error validating password:', error);
+                alert('Error validating password');
+            });
     };
 
     const handleDelete = (shiftId: number) => {

@@ -26,6 +26,10 @@ spring:
           writetimeout: 5000
           starttls:
             enable: true
+
+# Admin password
+admin:
+  password: cherry
             
 email:
   recipient: bradenborman00@gmail.com
