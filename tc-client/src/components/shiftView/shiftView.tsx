@@ -172,22 +172,6 @@ const ShiftView: React.FC = () => {
                     </Link>
                     
                     <Link 
-                        to="/note" 
-                        className={`group flex items-center rounded-2xl p-4 transition-all duration-200 hover:shadow-md border-2 ${
-                            isDarkMode
-                                ? 'bg-gray-700 hover:bg-gray-600 border-gray-600 hover:border-blue-500'
-                                : 'bg-white hover:bg-gray-50 border-gray-200 hover:border-blue-300'
-                        }`}
-                    >
-                        <span className="text-3xl mr-4">📝</span>
-                        <div className="flex-1">
-                            <div className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Leave a Note</div>
-                            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Send a message</div>
-                        </div>
-                        <span className={`transform group-hover:translate-x-1 transition-transform duration-200 ${isDarkMode ? 'text-gray-400' : 'text-gray-400'}`}>→</span>
-                    </Link>
-                    
-                    <Link 
                         to="/admin" 
                         className={`group flex items-center rounded-2xl p-4 transition-all duration-200 hover:shadow-md border-2 ${
                             isDarkMode

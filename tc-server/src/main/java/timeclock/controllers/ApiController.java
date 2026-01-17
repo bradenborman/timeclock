@@ -1,15 +1,13 @@
 package timeclock.controllers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import timeclock.models.Note;
 import timeclock.models.Shift;
 import timeclock.models.User;
+import timeclock.services.AdminService;
 import timeclock.services.TimeclockService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -17,20 +15,17 @@ import java.util.Map;
 @RestController
 public class ApiController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
     private final TimeclockService timeclockService;
-    
-    @Value("${admin.password}")
-    private String adminPassword;
+    private final AdminService adminService;
 
-    public ApiController(TimeclockService timeclockService) {
+    public ApiController(TimeclockService timeclockService, AdminService adminService) {
         this.timeclockService = timeclockService;
+        this.adminService = adminService;
     }
 
     @PostMapping("/admin/validate")
     public ResponseEntity<Map<String, Boolean>> validateAdminPassword(@RequestBody Map<String, String> request) {
-        String password = request.get("password");
-        boolean isValid = adminPassword.equals(password);
+        boolean isValid = adminService.validatePassword(request.get("password"));
         return ResponseEntity.ok(Map.of("valid", isValid));
     }
 
@@ -39,10 +34,21 @@ public class ApiController {
         return ResponseEntity.ok(timeclockService.getAllUsers());
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<User> getUserById(@PathVariable String userId) {
+        return ResponseEntity.ok(timeclockService.getUserById(userId));
+    }
+
     @PostMapping("/user")
     public ResponseEntity<Void> createUser(@RequestBody User user) {
         timeclockService.insertUser(user);
-       return ResponseEntity.ok().build();
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/user")
+    public ResponseEntity<Void> updateUser(@RequestBody User user) {
+        timeclockService.updateUser(user);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/clockin")
@@ -58,18 +64,7 @@ public class ApiController {
 
     @PostMapping("/clockout")
     public ResponseEntity<String> clockOut(@RequestBody Shift shift) {
-            return ResponseEntity.ok().body(timeclockService.clockOutShift(shift));
-    }
-
-    @PostMapping("/note")
-    public ResponseEntity<Void> note(@RequestBody String note) {
-        timeclockService.recordNewNote(note);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/notes")
-    public ResponseEntity<List<Note>> notes() {
-        return ResponseEntity.ok(timeclockService.findAllNotes());
+        return ResponseEntity.ok(timeclockService.clockOutShift(shift));
     }
 
     @DeleteMapping("/shift/{shiftId}")
@@ -80,28 +75,23 @@ public class ApiController {
 
     @PutMapping("/shift")
     public ResponseEntity<String> updateShift(@RequestBody Shift shift) {
-        String timeWorked = timeclockService.updateShift(shift);
-        return ResponseEntity.ok(timeWorked);
+        return ResponseEntity.ok(timeclockService.updateShift(shift));
     }
-
 
     @GetMapping("/email/send")
     public ResponseEntity<Void> sendEmail() {
-        logger.info("=== EMAIL SEND REQUEST RECEIVED ===");
-        logger.info("Endpoint: GET /api/email/send");
-        logger.info("Timestamp: {}", System.currentTimeMillis());
-        
-        try {
-            logger.info("Calling timeclockService.sendDailySummaryEmail()...");
-            timeclockService.sendDailySummaryEmail();
-            logger.info("=== EMAIL SEND COMPLETED SUCCESSFULLY ===");
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            logger.error("=== EMAIL SEND FAILED IN CONTROLLER ===");
-            logger.error("Error: {}", e.getMessage());
-            logger.error("Exception:", e);
-            throw e;
-        }
+        timeclockService.sendDailySummaryEmail();
+        return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/spreadsheet/download")
+    public ResponseEntity<byte[]> downloadSpreadsheet(@RequestParam String date) {
+        LocalDate localDate = LocalDate.parse(date);
+        Map<String, Object> result = timeclockService.generateSpreadsheetWithMetadata(localDate);
+        
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"" + result.get("filename") + "\"")
+                .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                .body((byte[]) result.get("data"));
+    }
 }

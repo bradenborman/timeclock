@@ -11,7 +11,7 @@ public class ViewController {
         return "login";
     }
 
-    @GetMapping(value={"/", "/start-shift", "/note", "/admin"})
+    @GetMapping(value={"/", "/start-shift", "/admin"})
     public String index() {
         return "index";
     }

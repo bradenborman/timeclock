@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import timeclock.models.Note;
 import timeclock.models.Shift;
 import timeclock.models.User;
 import timeclock.models.UserShiftRow;
@@ -17,7 +16,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -27,13 +28,11 @@ public class TimeclockService {
 
     private final UserService userService;
     private final ShiftService shiftService;
-    private final NoteService noteService;
     private final EmailService emailService;
 
-    public TimeclockService(UserService userService, ShiftService shiftService, NoteService noteService, EmailService emailService) {
+    public TimeclockService(UserService userService, ShiftService shiftService, EmailService emailService) {
         this.userService = userService;
         this.shiftService = shiftService;
-        this.noteService = noteService;
         this.emailService = emailService;
     }
 
@@ -41,10 +40,19 @@ public class TimeclockService {
         return userService.getAllUsers();
     }
 
+    public User getUserById(String userId) {
+        return userService.getUserById(userId);
+    }
+
     @Transactional
     public void insertUser(User user) {
        userService.insertUser(user);
        shiftService.startNewShift(user);
+    }
+
+    @Transactional
+    public void updateUser(User user) {
+        userService.updateUser(user);
     }
 
     @Transactional
@@ -63,19 +71,9 @@ public class TimeclockService {
         return shiftService.clockOutShift(shift);
     }
 
-    public void recordNewNote(String note) {
-        if(note != null && !note.isEmpty())
-            noteService.recordNewNote(note);
-    }
-
     public void removeShift(String shiftId) {
         shiftService.removeShift(shiftId);
     }
-
-    public List<Note> findAllNotes() {
-       return noteService.findAllNotes();
-    }
-
 
     public String updateShift(Shift shift) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
@@ -94,19 +92,40 @@ public class TimeclockService {
 
     public void sendDailySummaryEmail() {
         LocalDate today = DateUtility.todayCentralTime();
-        List<Note> notes = noteService.findAllNotes(today);
         List<UserShiftRow> userShifts = shiftService.retrieveUserShiftsToday();
         ByteArrayResource excelDocument = new WorkSheetBuilder().populateWorkbook(userShifts).toFile();
-        emailService.sendWorksheetEmail(excelDocument, notes, today);
+        emailService.sendWorksheetEmail(excelDocument, Collections.emptyList(), today);
         logger.info("Daily Summary Email sent");
     }
 
     public void sendDailySummaryEmail(LocalDate localDate) {
-        List<Note> notes = noteService.findAllNotes(localDate);
         List<UserShiftRow> userShifts = shiftService.retrieveUserShifts(localDate);
         ByteArrayResource excelDocument = new WorkSheetBuilder().populateWorkbook(userShifts).toFile();
-        emailService.sendWorksheetEmail(excelDocument, notes, localDate);
+        emailService.sendWorksheetEmail(excelDocument, Collections.emptyList(), localDate);
         logger.info("Summary Email sent for {}", localDate.format(DateTimeFormatter.ISO_DATE));
+    }
+
+    public byte[] generateSpreadsheet(LocalDate localDate) {
+        logger.info("Generating spreadsheet for date: {}", localDate);
+        List<UserShiftRow> userShifts = shiftService.retrieveUserShifts(localDate);
+        ByteArrayResource excelDocument = new WorkSheetBuilder().populateWorkbook(userShifts).toFile();
+        try {
+            return excelDocument.getByteArray();
+        } catch (Exception e) {
+            logger.error("Error converting spreadsheet to byte array", e);
+            throw new RuntimeException("Failed to generate spreadsheet", e);
+        }
+    }
+
+    public Map<String, Object> generateSpreadsheetWithMetadata(LocalDate localDate) {
+        logger.info("Generating spreadsheet with metadata for date: {}", localDate);
+        byte[] data = generateSpreadsheet(localDate);
+        String filename = DateUtility.formatDateForFileName(localDate) + "-timesheet.xlsx";
+        
+        return Map.of(
+            "data", data,
+            "filename", filename
+        );
     }
 
 

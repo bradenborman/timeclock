@@ -12,8 +12,9 @@ const Admin: React.FC = () => {
     const [password, setPassword] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [shifts, setShifts] = useState<Shift[]>([]);
-
     const [sendingEmailLoading, setSendingEmailLoading] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+    const [downloadingSpreadsheet, setDownloadingSpreadsheet] = useState(false);
 
 
 
@@ -113,9 +114,34 @@ const Admin: React.FC = () => {
         axios.get('/api/email/send')
             .then(response => {
                 setSendingEmailLoading(false)
+                alert('Email sent successfully!');
             })
             .catch(error => {
-                console.error('Error updating shift:', error);
+                console.error('Error sending email:', error);
+                setSendingEmailLoading(false)
+                alert('Error sending email');
+            });
+    }
+
+    const downloadSpreadsheet = (): void => {
+        setDownloadingSpreadsheet(true);
+        axios.get(`/api/spreadsheet/download?date=${selectedDate}`, {
+            responseType: 'blob'
+        })
+            .then(response => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `${selectedDate}-timesheet.xlsx`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setDownloadingSpreadsheet(false);
+            })
+            .catch(error => {
+                console.error('Error downloading spreadsheet:', error);
+                setDownloadingSpreadsheet(false);
+                alert('Error downloading spreadsheet');
             });
     }
 
@@ -147,36 +173,73 @@ const Admin: React.FC = () => {
             ) : (
                 <div className="flex justify-center items-center min-h-screen p-6">
                     <div className="container mx-auto w-full max-w-6xl bg-white shadow-2xl rounded-2xl overflow-hidden animate-fade-in border border-gray-100" style={{ maxHeight: '85vh' }}>
-                        <div className="bg-blue-600 p-6 flex justify-between items-center">
-                            <div>
-                                <h1 className="text-3xl font-bold text-white flex items-center">
-                                    <span className="text-4xl mr-3">👤</span>
-                                    Admin Panel
-                                </h1>
-                                <p className="text-blue-100 mt-1">Manage shifts and send reports</p>
+                        <div className="bg-blue-600 p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <div>
+                                    <h1 className="text-3xl font-bold text-white flex items-center">
+                                        <span className="text-4xl mr-3">👤</span>
+                                        Admin Panel
+                                    </h1>
+                                    <p className="text-blue-100 mt-1">Manage shifts and send reports</p>
+                                </div>
+                                <button
+                                    className={`bg-white hover:bg-gray-50 text-blue-600 font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center ${
+                                        sendingEmailLoading ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
+                                    onClick={e => triggerEmail()}
+                                    disabled={sendingEmailLoading}
+                                >
+                                    {sendingEmailLoading ? (
+                                        <>
+                                            <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Sending...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="text-xl mr-2">📧</span>
+                                            Send Email Report
+                                        </>
+                                    )}
+                                </button>
                             </div>
-                            <button
-                                className={`bg-white hover:bg-gray-50 text-blue-600 font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center ${
-                                    sendingEmailLoading ? 'opacity-50 cursor-not-allowed' : ''
-                                }`}
-                                onClick={e => triggerEmail()}
-                                disabled={sendingEmailLoading}
-                            >
-                                {sendingEmailLoading ? (
-                                    <>
-                                        <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Sending...
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="text-xl mr-2">📧</span>
-                                        Send Email Report
-                                    </>
-                                )}
-                            </button>
+                            
+                            {/* Download Spreadsheet Section */}
+                            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4">
+                                <div className="flex items-center gap-3 flex-1">
+                                    <span className="text-white font-semibold">📊 Download Spreadsheet:</span>
+                                    <input
+                                        type="date"
+                                        value={selectedDate}
+                                        onChange={(e) => setSelectedDate(e.target.value)}
+                                        className="px-4 py-2 rounded-lg border-2 border-white/20 bg-white/90 text-gray-800 font-medium focus:outline-none focus:ring-2 focus:ring-white"
+                                    />
+                                </div>
+                                <button
+                                    onClick={downloadSpreadsheet}
+                                    disabled={downloadingSpreadsheet}
+                                    className={`bg-white hover:bg-gray-50 text-blue-600 font-bold py-2 px-6 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center ${
+                                        downloadingSpreadsheet ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
+                                >
+                                    {downloadingSpreadsheet ? (
+                                        <>
+                                            <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Downloading...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="mr-2">⬇️</span>
+                                            Download
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                         
                         <div className="overflow-y-auto p-6" style={{ maxHeight: 'calc(85vh - 120px)' }}>

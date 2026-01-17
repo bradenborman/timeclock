@@ -11,10 +11,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final DataSource dataSource;
+
+    public SecurityConfig(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -29,17 +39,28 @@ public class SecurityConfig {
                 .permitAll()
             )
             .logout(logout -> logout
+                .deleteCookies("remember-me")
                 .permitAll()
             )
             .rememberMe(remember -> remember
+                .tokenRepository(persistentTokenRepository())
                 .tokenValiditySeconds(1814400) // 3 weeks in seconds
                 .key("timeclockRememberMeKey")
+                .rememberMeParameter("remember-me")
+                .useSecureCookie(false) // Set to true in production with HTTPS
             )
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers("/api/**")
             );
 
         return http.build();
+    }
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository() {
+        JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+        tokenRepository.setDataSource(dataSource);
+        return tokenRepository;
     }
 
     @Bean

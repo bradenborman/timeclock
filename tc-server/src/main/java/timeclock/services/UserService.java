@@ -34,6 +34,15 @@ public class UserService {
         user.setUserId(userId);
     }
 
+    public void updateUser(User user) {
+        // Format name to proper Title Case before updating
+        if (user.getName() != null && !user.getName().isEmpty()) {
+            user.setName(formatNameToTitleCase(user.getName()));
+        }
+        
+        userDao.updateUser(user);
+    }
+
     public User getUserById(String userId) {
          return userDao.getUserById(userId);
     }

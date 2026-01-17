@@ -7,6 +7,7 @@ public class User {
     private String phoneNumber;
     private String email;
     private String physicalMailingAddress;
+    private Integer yearVerified;
 
     public String getUserId() {
         return userId;
@@ -46,5 +47,13 @@ public class User {
 
     public void setPhysicalMailingAddress(String physicalMailingAddress) {
         this.physicalMailingAddress = physicalMailingAddress;
+    }
+
+    public Integer getYearVerified() {
+        return yearVerified;
+    }
+
+    public void setYearVerified(Integer yearVerified) {
+        this.yearVerified = yearVerified;
     }
 }

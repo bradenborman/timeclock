@@ -6,7 +6,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import timeclock.models.Note;
 import timeclock.utilities.DateUtility;
 
 import java.time.LocalDate;
@@ -44,7 +43,7 @@ public class EmailService {
         logger.info("=========================");
     }
 
-    public void sendWorksheetEmail(ByteArrayResource file, List<Note> notes, LocalDate dateOfQuery) {
+    public void sendWorksheetEmail(ByteArrayResource file, List<String> notes, LocalDate dateOfQuery) {
         logger.info("=== STARTING EMAIL SEND ===");
         logger.info("Date of query: {}", dateOfQuery);
         logger.info("Number of notes: {}", notes.size());
@@ -74,13 +73,14 @@ public class EmailService {
 
             // Build the email body
             logger.info("Building email body...");
-            StringBuilder emailBody = new StringBuilder("<p>Attached is today's Time-clock</p>" +
-                    "<h4>Notes:</h4>" +
-                    "<ul>");
-            for (Note note : notes) {
-                emailBody.append("<li>").append(note.getValue()).append("</li>");
+            StringBuilder emailBody = new StringBuilder("<p>Attached is today's Time-clock</p>");
+            if (!notes.isEmpty()) {
+                emailBody.append("<h4>Notes:</h4><ul>");
+                for (String note : notes) {
+                    emailBody.append("<li>").append(note).append("</li>");
+                }
+                emailBody.append("</ul>");
             }
-            emailBody.append("</ul>");
             logger.info("Email body built, length: {} characters", emailBody.length());
 
             logger.info("Setting email text...");

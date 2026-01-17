@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS Users (
     name VARCHAR(255) NOT NULL,
     phoneNumber VARCHAR(20) NULL,
     email VARCHAR(255) NULL,
-    physicalMailingAddress VARCHAR(255) NULL
+    physicalMailingAddress VARCHAR(255) NULL,
+    yearVerified INT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Shifts (
@@ -23,4 +24,12 @@ CREATE TABLE IF NOT EXISTS Notes (
     id INT PRIMARY KEY AUTO_INCREMENT,
     value TEXT NOT NULL,
     dateSubmitted TIMESTAMP NOT NULL
+);
+
+-- Spring Security Remember-Me token table
+CREATE TABLE IF NOT EXISTS persistent_logins (
+    username VARCHAR(64) NOT NULL,
+    series VARCHAR(64) PRIMARY KEY,
+    token VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP NOT NULL
 );

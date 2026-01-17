@@ -16,6 +16,7 @@ public class UserRowMapper implements RowMapper<User> {
         user.setPhoneNumber(rs.getString("phoneNumber"));
         user.setEmail(rs.getString("email"));
         user.setPhysicalMailingAddress(rs.getString("physicalMailingAddress"));
+        user.setYearVerified(rs.getObject("yearVerified", Integer.class));
         return user;
     }
 }

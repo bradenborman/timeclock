@@ -25,12 +25,19 @@ public class UserDao {
         String uuid = UUID.randomUUID().toString();
         user.setUserId(uuid);
 
-        final String sql = "INSERT INTO Users (userId, name, phoneNumber, email, physicalMailingAddress) " +
-                "VALUES (:userId, :name, :phoneNumber, :email, :physicalMailingAddress)";
+        final String sql = "INSERT INTO Users (userId, name, phoneNumber, email, physicalMailingAddress, yearVerified) " +
+                "VALUES (:userId, :name, :phoneNumber, :email, :physicalMailingAddress, :yearVerified)";
 
         namedParameterJdbcTemplate.update(sql, new BeanPropertySqlParameterSource(user));
 
         return uuid;
+    }
+
+    public void updateUser(User user) {
+        final String sql = "UPDATE Users SET name = :name, phoneNumber = :phoneNumber, email = :email, " +
+                "physicalMailingAddress = :physicalMailingAddress, yearVerified = :yearVerified WHERE userId = :userId";
+        
+        namedParameterJdbcTemplate.update(sql, new BeanPropertySqlParameterSource(user));
     }
 
     public List<User> selectAllUsers() {
@@ -41,6 +48,7 @@ public class UserDao {
             user.setPhoneNumber(rs.getString("phoneNumber"));
             user.setEmail(rs.getString("email"));
             user.setPhysicalMailingAddress(rs.getString("physicalMailingAddress"));
+            user.setYearVerified(rs.getObject("yearVerified", Integer.class));
             return user;
         });
     }
@@ -58,6 +66,7 @@ public class UserDao {
                 user.setPhoneNumber(rs.getString("phoneNumber"));
                 user.setEmail(rs.getString("email"));
                 user.setPhysicalMailingAddress(rs.getString("physicalMailingAddress"));
+                user.setYearVerified(rs.getObject("yearVerified", Integer.class));
                 return user;
             }
         });
