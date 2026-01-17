@@ -26,3 +26,6 @@ spring:
           writetimeout: 5000
           starttls:
             enable: true
+            
+email:
+  recipient: bradenborman00@gmail.com
