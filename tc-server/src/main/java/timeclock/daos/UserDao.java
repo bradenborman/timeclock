@@ -71,4 +71,11 @@ public class UserDao {
             }
         });
     }
+
+    public void deleteUser(String userId) {
+        final String sql = "DELETE FROM Users WHERE userId = :userId";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("userId", userId);
+        namedParameterJdbcTemplate.update(sql, params);
+    }
 }

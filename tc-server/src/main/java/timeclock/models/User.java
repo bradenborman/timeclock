@@ -8,6 +8,7 @@ public class User {
     private String email;
     private String physicalMailingAddress;
     private Integer yearVerified;
+    private boolean hidden;
 
     public String getUserId() {
         return userId;
@@ -55,5 +56,13 @@ public class User {
 
     public void setYearVerified(Integer yearVerified) {
         this.yearVerified = yearVerified;
+    }
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
     }
 }

@@ -34,6 +34,11 @@ public class ApiController {
         return ResponseEntity.ok(timeclockService.getAllUsers());
     }
 
+    @GetMapping("/users/all")
+    public ResponseEntity<List<User>> getAllUsersIncludingHidden() {
+        return ResponseEntity.ok(timeclockService.getAllUsersIncludingHidden());
+    }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable String userId) {
         return ResponseEntity.ok(timeclockService.getUserById(userId));
@@ -48,6 +53,18 @@ public class ApiController {
     @PutMapping("/user")
     public ResponseEntity<Void> updateUser(@RequestBody User user) {
         timeclockService.updateUser(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/user/{userId}")
+    public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable String userId) {
+        Map<String, Object> result = timeclockService.safeDeleteUser(userId);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/user/{userId}/unhide")
+    public ResponseEntity<Void> unhideUser(@PathVariable String userId) {
+        timeclockService.unhideUser(userId);
         return ResponseEntity.ok().build();
     }
 
@@ -93,5 +110,25 @@ public class ApiController {
                 .header("Content-Disposition", "attachment; filename=\"" + result.get("filename") + "\"")
                 .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
                 .body((byte[]) result.get("data"));
+    }
+
+    @DeleteMapping("/shifts/prior-to")
+    public ResponseEntity<Map<String, Object>> deleteShiftsPriorToDate(
+            @RequestParam String date,
+            @RequestParam String confirmation) {
+        
+        if (!"delete".equalsIgnoreCase(confirmation)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Confirmation word must be 'delete'"));
+        }
+        
+        LocalDate localDate = LocalDate.parse(date);
+        int deletedCount = timeclockService.deleteShiftsPriorToDate(localDate);
+        
+        return ResponseEntity.ok(Map.of(
+                "deletedCount", deletedCount,
+                "date", date,
+                "message", "Successfully deleted " + deletedCount + " shifts prior to " + date
+        ));
     }
 }

@@ -63,4 +63,13 @@ public class ShiftService {
     public List<UserShiftRow> retrieveUserShifts(LocalDate localDate) {
         return shiftDao.selectUserShiftRowsByDate(localDate);
     }
+
+    public boolean hasShifts(String userId) {
+        return shiftDao.countShiftsByUserId(userId) > 0;
+    }
+
+    public int deleteShiftsPriorToDate(LocalDate date) {
+        logger.info("Deleting all shifts prior to: {}", date);
+        return shiftDao.deleteShiftsPriorToDate(date);
+    }
 }

@@ -40,6 +40,10 @@ public class TimeclockService {
         return userService.getAllUsers();
     }
 
+    public List<User> getAllUsersIncludingHidden() {
+        return userService.getAllUsersIncludingHidden();
+    }
+
     public User getUserById(String userId) {
         return userService.getUserById(userId);
     }
@@ -53,6 +57,38 @@ public class TimeclockService {
     @Transactional
     public void updateUser(User user) {
         userService.updateUser(user);
+    }
+
+    public Map<String, Object> safeDeleteUser(String userId) {
+        boolean hasShifts = shiftService.hasShifts(userId);
+        
+        if (!hasShifts) {
+            // No shift history - safe to delete completely
+            userService.deleteUser(userId);
+            return Map.of(
+                "deleted", true,
+                "hidden", false,
+                "reason", "User deleted (no shift history)",
+                "shiftCount", 0
+            );
+        } else {
+            // Has shifts - must hide to preserve data integrity
+            userService.hideUser(userId, "admin", "Has shift history - soft delete");
+            return Map.of(
+                "deleted", false,
+                "hidden", true,
+                "reason", "User has shift history and was hidden to preserve data integrity",
+                "shiftCount", -1
+            );
+        }
+    }
+
+    public void unhideUser(String userId) {
+        userService.unhideUser(userId);
+    }
+
+    public int deleteShiftsPriorToDate(LocalDate date) {
+        return shiftService.deleteShiftsPriorToDate(date);
     }
 
     @Transactional

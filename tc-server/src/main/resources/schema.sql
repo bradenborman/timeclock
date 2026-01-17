@@ -33,3 +33,12 @@ CREATE TABLE IF NOT EXISTS persistent_logins (
     token VARCHAR(64) NOT NULL,
     last_used TIMESTAMP NOT NULL
 );
+
+-- Hidden Users table for soft deletes with metadata
+CREATE TABLE IF NOT EXISTS HiddenUsers (
+    userId VARCHAR(36) PRIMARY KEY,
+    dateHidden TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    hiddenBy VARCHAR(255) NULL,
+    reason VARCHAR(500) NULL,
+    FOREIGN KEY (userId) REFERENCES Users(userId)
+);

@@ -134,4 +134,19 @@ public class ShiftDao {
         });
     }
 
+    public int countShiftsByUserId(String userId) {
+        String sql = "SELECT COUNT(*) FROM Shifts WHERE userId = :userId";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("userId", userId);
+        Integer count = namedParameterJdbcTemplate.queryForObject(sql, params, Integer.class);
+        return count != null ? count : 0;
+    }
+
+    public int deleteShiftsPriorToDate(LocalDate date) {
+        String sql = "DELETE FROM Shifts WHERE DATE(clockIn) < :date";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("date", date);
+        return namedParameterJdbcTemplate.update(sql, params);
+    }
+
 }

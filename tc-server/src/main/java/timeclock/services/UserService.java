@@ -1,6 +1,7 @@
 package timeclock.services;
 
 import org.springframework.stereotype.Service;
+import timeclock.daos.HiddenUserDao;
 import timeclock.daos.UserDao;
 import timeclock.models.User;
 
@@ -13,13 +14,33 @@ import java.util.Arrays;
 public class UserService {
 
     private final UserDao userDao;
+    private final HiddenUserDao hiddenUserDao;
 
-    public UserService(UserDao userDao) {
+    public UserService(UserDao userDao, HiddenUserDao hiddenUserDao) {
         this.userDao = userDao;
+        this.hiddenUserDao = hiddenUserDao;
     }
 
     public List<User> getAllUsers() {
         List<User> users = userDao.selectAllUsers();
+        List<String> hiddenUserIds = hiddenUserDao.getAllHiddenUserIds();
+        
+        // Filter out hidden users
+        users = users.stream()
+                .filter(user -> !hiddenUserIds.contains(user.getUserId()))
+                .sorted(Comparator.comparing(User::getName))
+                .collect(Collectors.toList());
+        
+        return users;
+    }
+
+    public List<User> getAllUsersIncludingHidden() {
+        List<User> users = userDao.selectAllUsers();
+        List<String> hiddenUserIds = hiddenUserDao.getAllHiddenUserIds();
+        
+        // Mark hidden users
+        users.forEach(user -> user.setHidden(hiddenUserIds.contains(user.getUserId())));
+        
         users.sort(Comparator.comparing(User::getName));
         return users;
     }
@@ -45,6 +66,22 @@ public class UserService {
 
     public User getUserById(String userId) {
          return userDao.getUserById(userId);
+    }
+
+    public boolean isUserHidden(String userId) {
+        return hiddenUserDao.isUserHidden(userId);
+    }
+
+    public void hideUser(String userId, String hiddenBy, String reason) {
+        hiddenUserDao.hideUser(userId, hiddenBy, reason);
+    }
+
+    public void unhideUser(String userId) {
+        hiddenUserDao.unhideUser(userId);
+    }
+    
+    public void deleteUser(String userId) {
+        userDao.deleteUser(userId);
     }
     
     /**
