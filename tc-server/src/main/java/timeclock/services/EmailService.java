@@ -45,11 +45,13 @@ public class EmailService {
 
             helper.setText(emailBody.toString(), true);
             helper.addAttachment(formattedDateString + "-timesheet.xlsx", file);
+            
+            javaMailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send email!", e);
+            throw new RuntimeException("Failed to create email message: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send email. Check that SPRING_MAIL_USERNAME and SPRING_MAIL_PASSWORD are set. Error: " + e.getMessage(), e);
         }
-
-        javaMailSender.send(message);
     }
 
 }

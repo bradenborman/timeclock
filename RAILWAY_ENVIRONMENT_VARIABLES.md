@@ -110,11 +110,15 @@ SPRING_DATASOURCE_URL=jdbc:mysql://${{MySQL.MYSQLHOST}}:${{MySQL.MYSQLPORT}}/${{
 SPRING_DATASOURCE_USERNAME=${{MySQL.MYSQLUSER}}
 SPRING_DATASOURCE_PASSWORD=${{MySQL.MYSQLPASSWORD}}
 
-# Email (replace with your actual values)
+# Email (REQUIRED - replace with your actual values)
 SPRING_MAIL_USERNAME=your-email@gmail.com
 SPRING_MAIL_PASSWORD=your-gmail-app-password
-EMAIL_RECIPIENT=recipient@example.com
+
+# Admin password (optional, defaults to 'cherry')
+ADMIN_PASSWORD=cherry
 ```
+
+**⚠️ IMPORTANT:** Without `SPRING_MAIL_USERNAME` and `SPRING_MAIL_PASSWORD`, the email functionality will fail with a timeout error!
 
 ## Step-by-Step in Railway Dashboard
 

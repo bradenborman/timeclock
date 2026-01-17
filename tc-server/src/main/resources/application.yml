@@ -17,19 +17,20 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
           auth: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
           starttls:
             enable: true
+            required: true
+        debug: false
 
 # Admin password
 admin:
-  password: cherry
-            
-email:
-  recipient: bradenborman00@gmail.com
+  password: ${ADMIN_PASSWORD:cherry}
