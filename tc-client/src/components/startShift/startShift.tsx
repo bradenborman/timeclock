@@ -30,6 +30,52 @@ const StartShift: React.FC = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [physicalMailingAddress, setPhysicalMailingAddress] = useState('');
 
+    // Validation states
+    const [emailError, setEmailError] = useState('');
+    const [phoneError, setPhoneError] = useState('');
+
+    // Calculate progress
+    const calculateProgress = () => {
+        let completed = 0;
+        if (name.trim()) completed++;
+        if (email.trim() && !emailError) completed++;
+        if (phoneNumber.trim() && !phoneError) completed++;
+        if (physicalMailingAddress.trim()) completed++;
+        return completed;
+    };
+
+    const validateEmail = (email: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            setEmailError('');
+            return true;
+        }
+        if (!emailRegex.test(email)) {
+            setEmailError('Please enter a valid email address');
+            return false;
+        }
+        setEmailError('');
+        return true;
+    };
+
+    const validatePhone = (phone: string) => {
+        const phoneRegex = /^[\d\s\-\(\)]+$/;
+        if (!phone) {
+            setPhoneError('');
+            return true;
+        }
+        if (phone.replace(/[\s\-\(\)]/g, '').length < 10) {
+            setPhoneError('Phone number must be at least 10 digits');
+            return false;
+        }
+        if (!phoneRegex.test(phone)) {
+            setPhoneError('Please enter a valid phone number');
+            return false;
+        }
+        setPhoneError('');
+        return true;
+    };
+
 
     useEffect(() => {
         axios.get('/api/users')
@@ -48,6 +94,15 @@ const StartShift: React.FC = () => {
 
     const handleNewUserSubmit = (e: React.FormEvent): void => {
         e.preventDefault();
+        
+        // Final validation check
+        const isEmailValid = validateEmail(email);
+        const isPhoneValid = validatePhone(phoneNumber);
+        
+        if (!isEmailValid || !isPhoneValid) {
+            return;
+        }
+        
         setIsLoading(true);
 
         const userData = {
@@ -121,9 +176,6 @@ const StartShift: React.FC = () => {
                         <div className="relative z-10 text-center text-white p-12 transform group-hover:scale-110 transition-all duration-500">
                             <div className="text-8xl mb-8 animate-bounce-subtle">✨</div>
                             <h2 className="text-6xl font-bold mb-6">First Time This Year</h2>
-                            <p className="text-2xl text-blue-100 mb-8 max-w-md mx-auto">
-                                New to the team? Let's get you set up with a quick registration.
-                            </p>
                             <div className="inline-flex items-center text-2xl font-semibold bg-white/20 backdrop-blur-sm px-8 py-4 rounded-full group-hover:bg-white/30 transition-all duration-300">
                                 <span>Get Started</span>
                                 <span className="ml-3 transform group-hover:translate-x-2 transition-transform duration-300">→</span>
@@ -143,9 +195,6 @@ const StartShift: React.FC = () => {
                         <div className="relative z-10 text-center text-white p-12 transform group-hover:scale-110 transition-all duration-500">
                             <div className="text-8xl mb-8 animate-bounce-subtle">👋</div>
                             <h2 className="text-6xl font-bold mb-6">Welcome Back</h2>
-                            <p className="text-2xl text-gray-300 mb-8 max-w-md mx-auto">
-                                Already in the system? Quick clock-in with just your name.
-                            </p>
                             <div className="inline-flex items-center text-2xl font-semibold bg-white/20 backdrop-blur-sm px-8 py-4 rounded-full group-hover:bg-white/30 transition-all duration-300">
                                 <span>Clock In Now</span>
                                 <span className="ml-3 transform group-hover:translate-x-2 transition-transform duration-300">→</span>
@@ -175,7 +224,26 @@ const StartShift: React.FC = () => {
                                     <span className="text-5xl mr-4">📋</span>
                                     Tell us about yourself
                                 </h2>
-                                <p className="text-blue-100 text-lg">Just a few details to get you started</p>
+                                <p className="text-blue-100 text-lg mb-4">Just a few details to get you started</p>
+                                
+                                {/* Progress Tracker */}
+                                <div className="flex items-center gap-2 mt-6">
+                                    <div className="flex-1 flex gap-2">
+                                        {[1, 2, 3, 4].map((step) => (
+                                            <div
+                                                key={step}
+                                                className={`h-2 flex-1 rounded-full transition-all duration-300 ${
+                                                    calculateProgress() >= step
+                                                        ? 'bg-white'
+                                                        : 'bg-white/30'
+                                                }`}
+                                            ></div>
+                                        ))}
+                                    </div>
+                                    <span className="text-sm font-semibold ml-2">
+                                        {calculateProgress()}/4 Complete
+                                    </span>
+                                </div>
                             </div>
                             
                             <form onSubmit={handleNewUserSubmit} className="p-8" autoComplete="off">
@@ -195,9 +263,11 @@ const StartShift: React.FC = () => {
                                             name="search"
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
+                                            onFocus={(e) => e.target.removeAttribute('readonly')}
                                             className="w-full p-4 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none"
                                             placeholder="John Johnson"
                                             autoComplete="new-password"
+                                            readOnly
                                         />
                                     </div>
                                     
@@ -211,11 +281,27 @@ const StartShift: React.FC = () => {
                                             id="email"
                                             name="search-email"
                                             value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            className="w-full p-4 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none"
+                                            onChange={(e) => {
+                                                setEmail(e.target.value);
+                                                validateEmail(e.target.value);
+                                            }}
+                                            onBlur={(e) => validateEmail(e.target.value)}
+                                            onFocus={(e) => e.target.removeAttribute('readonly')}
+                                            className={`w-full p-4 text-lg border-2 rounded-xl focus:ring-4 transition-all duration-200 outline-none ${
+                                                emailError
+                                                    ? 'border-red-500 focus:border-red-500 focus:ring-red-100'
+                                                    : 'border-gray-200 focus:border-blue-500 focus:ring-blue-100'
+                                            }`}
                                             placeholder="john@example.com"
                                             autoComplete="new-password"
+                                            readOnly
                                         />
+                                        {emailError && (
+                                            <p className="text-red-500 text-sm mt-2 flex items-center">
+                                                <span className="mr-1">⚠️</span>
+                                                {emailError}
+                                            </p>
+                                        )}
                                     </div>
                                     
                                     <div>
@@ -228,11 +314,27 @@ const StartShift: React.FC = () => {
                                             id="phoneNumber"
                                             name="search-phone"
                                             value={phoneNumber}
-                                            onChange={(e) => setPhoneNumber(e.target.value)}
-                                            className="w-full p-4 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none"
+                                            onChange={(e) => {
+                                                setPhoneNumber(e.target.value);
+                                                validatePhone(e.target.value);
+                                            }}
+                                            onBlur={(e) => validatePhone(e.target.value)}
+                                            onFocus={(e) => e.target.removeAttribute('readonly')}
+                                            className={`w-full p-4 text-lg border-2 rounded-xl focus:ring-4 transition-all duration-200 outline-none ${
+                                                phoneError
+                                                    ? 'border-red-500 focus:border-red-500 focus:ring-red-100'
+                                                    : 'border-gray-200 focus:border-blue-500 focus:ring-blue-100'
+                                            }`}
                                             placeholder="123-456-7890"
                                             autoComplete="new-password"
+                                            readOnly
                                         />
+                                        {phoneError && (
+                                            <p className="text-red-500 text-sm mt-2 flex items-center">
+                                                <span className="mr-1">⚠️</span>
+                                                {phoneError}
+                                            </p>
+                                        )}
                                     </div>
                                     
                                     <div className="md:col-span-2">
@@ -246,9 +348,11 @@ const StartShift: React.FC = () => {
                                             name="search-address"
                                             value={physicalMailingAddress}
                                             onChange={(e) => setPhysicalMailingAddress(e.target.value)}
+                                            onFocus={(e) => e.target.removeAttribute('readonly')}
                                             className="w-full p-4 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none"
                                             placeholder="123 Main St, City, State 12345"
                                             autoComplete="new-password"
+                                            readOnly
                                             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                                                 if (event.key === 'Enter') {
                                                     event.preventDefault();
@@ -261,9 +365,9 @@ const StartShift: React.FC = () => {
                                 <button
                                     type="submit"
                                     className={`w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-5 px-8 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200 text-xl ${
-                                        isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                                        isLoading || emailError || phoneError || calculateProgress() < 4 ? 'opacity-50 cursor-not-allowed' : ''
                                     }`}
-                                    disabled={isLoading}
+                                    disabled={isLoading || !!emailError || !!phoneError || calculateProgress() < 4}
                                 >
                                     {isLoading ? (
                                         <span className="flex items-center justify-center">
