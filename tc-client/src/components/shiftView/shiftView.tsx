@@ -94,68 +94,101 @@ const ShiftView: React.FC = () => {
     const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
             {newestUser != undefined ? (<Toast message={newestUser + " has started a shift!"} />) : null}
-            <div className="bg-gray-800 text-white w-72 p-6 fixed h-full">
-                <h3 className="text-xl font-semibold fancy-text">The Candy Factory Timesheet</h3>
-                <div className="mb-3">
-                    <h2 className="text-md font-bold">{today}</h2>
+            
+            {/* Sidebar */}
+            <div className="bg-gradient-to-b from-candy-purple to-candy-blue text-white w-72 p-6 fixed h-full shadow-2xl">
+                <div className="mb-8">
+                    <h3 className="text-2xl font-bold fancy-text mb-2 text-candy-yellow">🍬 The Candy Factory</h3>
+                    <p className="text-sm text-white/80">Timesheet</p>
                 </div>
-                <hr />
-                <ul className="mt-5">
-                    <li className='mt-8'>
-                        <Link to="/start-shift" className="text-5xl text-indigo-200 hover:text-indigo-100 font-bold">
-                            Start Shift
-                        </Link>
-                    </li>
-                    <li className='mt-4'>
-                        <Link to="/note" className="text-lg text-indigo-200 hover:text-indigo-100">
-                            📝 Leave a Note
-                        </Link>
-                    </li>
-                    <li className='mt-4'>
-                        <Link to="/admin" className="text-lg text-indigo-200 hover:text-indigo-100">
-                            👤 Admin
-                        </Link>
-                    </li>
-                </ul>
+                <div className="mb-6 bg-white/10 backdrop-blur-sm rounded-lg p-3">
+                    <h2 className="text-sm font-semibold text-white/90">{today}</h2>
+                </div>
+                <div className="h-px bg-white/20 mb-6"></div>
+                <nav className="space-y-4">
+                    <Link 
+                        to="/start-shift" 
+                        className="block text-4xl font-bold text-white hover:text-candy-yellow transition-all duration-300 hover:translate-x-2 transform"
+                    >
+                        ▶ Start Shift
+                    </Link>
+                    <Link 
+                        to="/note" 
+                        className="flex items-center text-lg text-white/90 hover:text-white hover:bg-white/10 rounded-lg p-3 transition-all duration-200"
+                    >
+                        <span className="text-2xl mr-3">📝</span>
+                        <span>Leave a Note</span>
+                    </Link>
+                    <Link 
+                        to="/admin" 
+                        className="flex items-center text-lg text-white/90 hover:text-white hover:bg-white/10 rounded-lg p-3 transition-all duration-200"
+                    >
+                        <span className="text-2xl mr-3">👤</span>
+                        <span>Admin Panel</span>
+                    </Link>
+                </nav>
             </div>
-            <div className="flex-1 ml-72 p-6 overflow-auto">
-                <div className="overflow-x-auto">
-                    <table className="table-auto w-full text-xl">
-                        <thead className="sticky top-0 bg-white">
-                            <tr className="bg-gray-200">
-                                <th className="px-4 py-2 w-3/5 text-left">Name</th>
-                                <th className="px-4 py-2 min-w-[120px] w-[10%]">Time In</th>
-                                <th className="px-4 py-2 min-w-[120px] w-[10%]">Time Out</th>
-                                <th className="px-4 py-2 min-w-[130px] w-[10%] text-lg">⏱ Worked</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {shifts.map((shift) => (
-                                <tr key={shift.shiftId} className="text-center border-b border-gray-200 shift-row">
-                                    <td className="px-4 py-3 text-left">
-                                        {shift.name}
-                                    </td>
-                                    <td className="px-4 py-2">{shift.clockIn}</td>
-                                    <td className="px-4 py-2">
-                                        {shift.clockIn && !shift.clockOut ? ( // Check if clockIn is set and clockOut is not
-                                            <button
-                                                onClick={() => handleClockOut(shift.shiftId)}
-                                                className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm ${shift.isLoading ? 'opacity-50' : ''}`}
-                                                disabled={shift.isLoading}
-                                            >
-                                                {shift.isLoading ? 'Submitting...' : 'Clock Out'}
-                                            </button>
-                                        ) : (
-                                            shift.clockOut || '—'
-                                        )}
-                                    </td>
-                                    <td className="px-4 py-2">{shift.timeWorked || '—'}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+
+            {/* Main Content */}
+            <div className="flex-1 ml-72 p-8 overflow-auto">
+                <div className="max-w-7xl mx-auto">
+                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden animate-fade-in">
+                        <div className="overflow-x-auto">
+                            <table className="table-auto w-full text-xl">
+                                <thead className="sticky top-0 bg-gradient-to-r from-candy-purple to-candy-blue text-white">
+                                    <tr>
+                                        <th className="px-6 py-4 w-3/5 text-left font-semibold">Name</th>
+                                        <th className="px-6 py-4 min-w-[120px] w-[10%] font-semibold">Time In</th>
+                                        <th className="px-6 py-4 min-w-[120px] w-[10%] font-semibold">Time Out</th>
+                                        <th className="px-6 py-4 min-w-[130px] w-[10%] text-lg font-semibold">⏱ Worked</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {shifts.map((shift, index) => (
+                                        <tr 
+                                            key={shift.shiftId} 
+                                            className={`text-center border-b border-gray-100 hover:bg-purple-50 transition-colors duration-150 ${
+                                                index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                                            }`}
+                                        >
+                                            <td className="px-6 py-4 text-left font-medium text-gray-800">
+                                                {shift.name}
+                                            </td>
+                                            <td className="px-6 py-3 text-gray-700">{shift.clockIn}</td>
+                                            <td className="px-6 py-3">
+                                                {shift.clockIn && !shift.clockOut ? (
+                                                    <button
+                                                        onClick={() => handleClockOut(shift.shiftId)}
+                                                        className={`bg-gradient-to-r from-candy-pink to-candy-purple hover:from-candy-purple hover:to-candy-blue text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 ${
+                                                            shift.isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                                                        }`}
+                                                        disabled={shift.isLoading}
+                                                    >
+                                                        {shift.isLoading ? (
+                                                            <span className="flex items-center">
+                                                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                </svg>
+                                                                Clocking Out...
+                                                            </span>
+                                                        ) : (
+                                                            'Clock Out'
+                                                        )}
+                                                    </button>
+                                                ) : (
+                                                    <span className="text-gray-700">{shift.clockOut || '—'}</span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-3 font-semibold text-candy-purple">{shift.timeWorked || '—'}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,5 +1,7 @@
 package timeclock.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.util.Map;
 @RestController
 public class ApiController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
     private final TimeclockService timeclockService;
     
     @Value("${admin.password}")
@@ -84,8 +87,21 @@ public class ApiController {
 
     @GetMapping("/email/send")
     public ResponseEntity<Void> sendEmail() {
-        timeclockService.sendDailySummaryEmail();
-        return ResponseEntity.ok().build();
+        logger.info("=== EMAIL SEND REQUEST RECEIVED ===");
+        logger.info("Endpoint: GET /api/email/send");
+        logger.info("Timestamp: {}", System.currentTimeMillis());
+        
+        try {
+            logger.info("Calling timeclockService.sendDailySummaryEmail()...");
+            timeclockService.sendDailySummaryEmail();
+            logger.info("=== EMAIL SEND COMPLETED SUCCESSFULLY ===");
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            logger.error("=== EMAIL SEND FAILED IN CONTROLLER ===");
+            logger.error("Error: {}", e.getMessage());
+            logger.error("Exception:", e);
+            throw e;
+        }
     }
 
 }

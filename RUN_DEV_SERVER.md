@@ -1,108 +1,88 @@
-# Running the DevlServer
-
-The `DevlServer` is a development server that runs with `local` and `secret` profiles.
-
-## Option 1: From IDE (Recommended)
-
-### IntelliJ IDEA
-1. Open `tc-server/src/test/java/timeclock/DevlServer.java`
-2. Right-click on the file or the `main` method
-3. Select **"Run 'DevlServer.main()'"**
-4. Server starts at `http://localhost:8080`
-
-### Eclipse
-1. Open `tc-server/src/test/java/timeclock/DevlServer.java`
-2. Right-click on the file
-3. Select **"Run As" → "Java Application"**
-4. Server starts at `http://localhost:8080`
-
-### VS Code
-1. Open `tc-server/src/test/java/timeclock/DevlServer.java`
-2. Click the **"Run"** button above the `main` method
-3. Server starts at `http://localhost:8080`
-
-## Option 2: From Command Line
-
-### Using Gradle (compiles test classes and runs)
-```bash
-./gradlew :tc-server:testClasses
-java -cp "tc-server/build/classes/java/test;tc-server/build/classes/java/main;tc-server/build/resources/main;$(./gradlew :tc-server:printClasspath -q)" timeclock.DevlServer
-```
-
-### Simpler: Use bootRun with profiles
-```bash
-./gradlew bootRun --args='--spring.profiles.active=local,secret'
-```
-
-This does the same thing as DevlServer!
-
-## Option 3: Create a Run Configuration
-
-### IntelliJ IDEA
-1. Go to **Run → Edit Configurations**
-2. Click **+** → **Application**
-3. Set:
-   - **Name**: DevlServer
-   - **Main class**: `timeclock.DevlServer`
-   - **Module**: `timeclock.tc-server.test`
-   - **Working directory**: `$MODULE_WORKING_DIR$`
-4. Click **OK**
-5. Now you can run it from the toolbar dropdown
-
-## What Does DevlServer Do?
-
-It starts the Spring Boot application with:
-- **Profile**: `local` (uses Railway MySQL from application-local.yml)
-- **Profile**: `secret` (loads application-secret.yml if it exists)
-
-This is useful for:
-- Testing with production-like database
-- Running with secret credentials not in git
-- Development without modifying main application
-
-## Profiles Explained
-
-### `local` Profile
-Configured in `tc-server/src/main/resources/application-local.yml`:
-- Connects to Railway MySQL database
-- Uses your development credentials
-
-### `secret` Profile (Optional)
-Create `tc-server/src/main/resources/application-secret.yml`:
-```yaml
-spring:
-  mail:
-    username: your-email@gmail.com
-    password: your-app-password
-
-email:
-  recipient: recipient@example.com
-```
-
-Add to `.gitignore`:
-```
-**/application-secret.yml
-```
-
-## Troubleshooting
-
-### "Cannot find symbol: class DevlServer"
-Run: `./gradlew :tc-server:testClasses`
-
-### "Database connection failed"
-Check `application-local.yml` has correct Railway MySQL credentials.
-
-### "Port 8080 already in use"
-Stop other Spring Boot instances or change port:
-```bash
-./gradlew bootRun --args='--spring.profiles.active=local,secret --server.port=8081'
-```
+# Running the Development Server
 
 ## Quick Start
 
-**Easiest way:**
+### Option 1: Run Everything (Recommended)
 ```bash
 ./gradlew bootRun --args='--spring.profiles.active=local,secret'
 ```
+This will:
+1. Build the React frontend (via Gradle)
+2. Start the Spring Boot backend on port 8080
+3. Serve the frontend from `http://localhost:8080`
 
-This runs the same configuration as DevlServer without needing to compile test classes!
+### Option 2: Frontend Only (For UI Development)
+```bash
+cd tc-client
+pnpm run dev
+```
+This starts Vite dev server on `http://localhost:5173` with hot reload.
+
+**Note**: You'll need the backend running separately for API calls to work.
+
+### Option 3: Backend Only
+```bash
+./gradlew bootRun --args='--spring.profiles.active=local,secret'
+```
+Backend runs on `http://localhost:8080` and serves pre-built frontend from `static/` folder.
+
+## Development Workflow
+
+### For UI/UX Changes (Fast Iteration)
+1. Start backend: `./gradlew bootRun --args='--spring.profiles.active=local,secret'`
+2. In another terminal, start frontend: `cd tc-client && pnpm run dev`
+3. Open `http://localhost:5173` (Vite dev server)
+4. Make changes to React components - they hot reload instantly!
+
+### For Full Stack Testing
+1. Build frontend: `cd tc-client && pnpm run build`
+2. Copy build to Spring Boot: `./gradlew build`
+3. Run: `./gradlew bootRun --args='--spring.profiles.active=local,secret'`
+4. Open `http://localhost:8080`
+
+## Environment Requirements
+
+### Required Files
+- `tc-server/src/main/resources/application-secret.yml` (contains database credentials)
+
+### Required Environment Variables (for Railway deployment)
+- `SPRING_MAIL_USERNAME` - Gmail address for sending emails
+- `SPRING_MAIL_PASSWORD` - Gmail app password
+- `ADMIN_PASSWORD` - Admin panel password (default: "cherry")
+
+## Ports
+- **Backend**: 8080
+- **Frontend Dev Server**: 5173 (Vite)
+- **MySQL TCP Proxy**: 25228 (Railway)
+
+## Troubleshooting
+
+### "pnpm: command not found"
+```bash
+npm install -g pnpm
+```
+
+### Database Connection Issues
+Check `application-local.yml` and `application-secret.yml` have correct Railway MySQL credentials.
+
+### Frontend Not Loading
+1. Check if `tc-server/src/main/resources/static/` has built files
+2. Run `cd tc-client && pnpm run build` to rebuild
+3. Restart Spring Boot server
+
+### Hot Reload Not Working
+Make sure you're accessing `http://localhost:5173` (Vite) not `http://localhost:8080` (Spring Boot).
+
+## Performance Notes
+- **Vite Dev Server**: Starts in ~242ms, hot reload in <100ms
+- **Full Gradle Build**: ~30-60 seconds (includes frontend build)
+- **pnpm install**: ~1-2 seconds (cached), ~57 seconds (first time)
+
+## New UI Features to Test
+1. **Gradient backgrounds** on all pages
+2. **Hover effects** on buttons and links
+3. **Loading spinners** when submitting forms
+4. **Toast notifications** when starting shifts
+5. **Smooth animations** on page load
+6. **Modern form inputs** with focus states
+7. **Enhanced admin panel** with better table design

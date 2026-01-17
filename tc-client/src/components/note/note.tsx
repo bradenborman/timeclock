@@ -18,28 +18,42 @@ const Note: React.FC = () => {
     };
 
     return (
-        <div className="bg-gray-100 min-h-screen flex justify-center items-center">
-            <Link to="/" className="absolute top-4 left-4 bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded">
-                Return Home
+        <div className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 min-h-screen flex justify-center items-center p-4">
+            <Link 
+                to="/" 
+                className="absolute top-6 left-6 bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center"
+            >
+                <span className="mr-2">←</span> Return Home
             </Link>
-            <div className="container mx-auto p-6 w-full max-w-4xl">
-                <h2 className="fancy-text text-5xl font-bold text-center mb-6">Leave us a note</h2>
-                <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md">
+            
+            <div className="container mx-auto p-6 w-full max-w-4xl animate-fade-in">
+                <div className="text-center mb-8">
+                    <h2 className="fancy-text text-6xl font-bold bg-gradient-to-r from-candy-purple to-candy-blue bg-clip-text text-transparent mb-3">
+                        📝 Leave us a note
+                    </h2>
+                    <p className="text-gray-600 text-lg">We'd love to hear from you!</p>
+                </div>
+                
+                <form onSubmit={handleSubmit} className="bg-white p-10 rounded-2xl shadow-2xl animate-slide-up">
                     <div className="mb-6">
-                        <label htmlFor="note" className="block text-gray-700 text-sm font-bold mb-2">(Make sure to include who is submitting this)</label>
+                        <label htmlFor="note" className="block text-gray-700 font-semibold mb-3 text-lg">
+                            Your Message
+                            <span className="text-sm text-gray-500 font-normal ml-2">(Make sure to include your name)</span>
+                        </label>
                         <textarea
                             id="note"
-                            className="resize-none w-full h-48 p-4 border border-gray-300 rounded focus:outline-none focus:shadow-outline"
+                            className="resize-none w-full h-56 p-5 border-2 border-gray-200 rounded-xl focus:border-candy-purple focus:ring-2 focus:ring-candy-purple/20 transition-all duration-200 outline-none text-lg"
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
+                            placeholder="Type your message here..."
                             required
                         />
                     </div>
                     <button
                         type="submit"
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className="w-full bg-gradient-to-r from-candy-purple to-candy-blue text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-lg"
                     >
-                        Submit
+                        ✉️ Submit Note
                     </button>
                 </form>
             </div>

@@ -121,110 +121,155 @@ const Admin: React.FC = () => {
 
 
     return (
-        <div className="bg-gray-100 min-h-screen">
-            <Link to="/" className="absolute top-4 left-4 bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded">
-                Return Home
+        <div className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 min-h-screen">
+            <Link 
+                to="/" 
+                className="absolute top-6 left-6 bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center z-10"
+            >
+                <span className="mr-2">←</span> Return Home
             </Link>
+            
             {!isAuthenticated ? (
                 <div className="flex justify-center items-center h-screen">
-                    <Login
-                        password={password}
-                        setPassword={setPassword}
-                        handlePasswordSubmit={handlePasswordSubmit}
-                    />
-                </div>
-            ) : (
-                <div className="flex justify-center items-center min-h-screen">
-                    <div className="container mx-auto p-5 w-full max-w-4xl bg-white shadow-lg rounded" style={{ maxHeight: '700px', overflowY: 'auto' }}>
-                        <button
-                            className={`bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded mb-3 float-right ${sendingEmailLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            onClick={e => triggerEmail()}
-                        >
-                            {sendingEmailLoading ? 'Sending...' : '📧 Send Email'}
-                        </button>
-                        <table className="table-auto w-full text-left">
-                            <thead>
-                                <tr className="bg-gray-200">
-                                    <th className="px-4 py-2">Name</th>
-                                    <th className="px-4 py-2">Clock In</th>
-                                    <th className="px-4 py-2">Clock Out</th>
-                                    <th className="px-4 py-2">Time Worked</th>
-                                    <th className="px-4 py-2">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {shifts.map((shift, index) => (
-                                    <tr key={shift.shiftId} className={`${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
-                                        <td className="border px-4 py-2">{shift.name}</td>
-                                        <td className="border px-4 py-2">
-                                            {shift.isEditing ? (
-                                                <input
-                                                    type="text"
-                                                    value={shift.clockIn}
-                                                    onChange={(e) => updateClockIn(shift.shiftId, e.target.value)}
-                                                    className="w-full border-2 border-blue-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                                    style={{ maxWidth: 85, paddingLeft: 5 }}
-                                                />
-                                            ) : (
-                                                shift.clockIn
-                                            )}
-                                        </td>
-                                        <td className="border px-4 py-2">
-                                            {shift.isEditing ? (
-                                                <input
-                                                    type="text"
-                                                    value={shift.clockOut}
-                                                    onChange={(e) => updateClockOut(shift.shiftId, e.target.value)}
-                                                    className="w-full border-2 border-blue-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                                    style={{ maxWidth: 85, paddingLeft: 5 }}
-                                                />
-                                            ) : (
-                                                shift.clockOut
-                                            )}
-                                        </td>
-                                        <td className="border px-4 py-2">{shift.timeWorked}</td>
-                                        <td className="border px-4 py-2 flex justify-start items-center space-x-2">
-                                            {shift.isEditing ? (
-                                                <>
-                                                    <button
-                                                        onClick={() => saveShift(shift.shiftId)}
-                                                        className="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded"
-                                                    >
-                                                        Save
-                                                    </button>
-                                                    <button
-                                                        onClick={() => navigate(0)}
-                                                        className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-3 rounded"
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <button
-                                                        onClick={() => toggleEdit(shift.shiftId)}
-                                                        className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded"
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(shift.shiftId)}
-                                                        className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded"
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div className="bg-white p-10 rounded-2xl shadow-2xl animate-fade-in">
+                        <div className="text-center mb-8">
+                            <div className="text-6xl mb-4">🔐</div>
+                            <h2 className="text-3xl font-bold text-gray-800 mb-2">Admin Access</h2>
+                            <p className="text-gray-600">Enter password to continue</p>
+                        </div>
+                        <Login
+                            password={password}
+                            setPassword={setPassword}
+                            handlePasswordSubmit={handlePasswordSubmit}
+                        />
                     </div>
                 </div>
-            )
-            }
-        </div >
+            ) : (
+                <div className="flex justify-center items-center min-h-screen p-6">
+                    <div className="container mx-auto w-full max-w-6xl bg-white shadow-2xl rounded-2xl overflow-hidden animate-fade-in" style={{ maxHeight: '85vh' }}>
+                        <div className="bg-gradient-to-r from-candy-purple to-candy-blue p-6 flex justify-between items-center">
+                            <div>
+                                <h1 className="text-3xl font-bold text-white flex items-center">
+                                    <span className="text-4xl mr-3">👤</span>
+                                    Admin Panel
+                                </h1>
+                                <p className="text-white/80 mt-1">Manage shifts and send reports</p>
+                            </div>
+                            <button
+                                className={`bg-white hover:bg-gray-50 text-candy-purple font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center ${
+                                    sendingEmailLoading ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
+                                onClick={e => triggerEmail()}
+                                disabled={sendingEmailLoading}
+                            >
+                                {sendingEmailLoading ? (
+                                    <>
+                                        <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-candy-purple" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Sending...
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="text-xl mr-2">📧</span>
+                                        Send Email Report
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                        
+                        <div className="overflow-y-auto p-6" style={{ maxHeight: 'calc(85vh - 120px)' }}>
+                            <table className="table-auto w-full text-left">
+                                <thead className="sticky top-0 bg-gray-100 z-10">
+                                    <tr className="border-b-2 border-gray-300">
+                                        <th className="px-4 py-3 font-semibold text-gray-700">Name</th>
+                                        <th className="px-4 py-3 font-semibold text-gray-700">Clock In</th>
+                                        <th className="px-4 py-3 font-semibold text-gray-700">Clock Out</th>
+                                        <th className="px-4 py-3 font-semibold text-gray-700">Time Worked</th>
+                                        <th className="px-4 py-3 font-semibold text-gray-700">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {shifts.map((shift, index) => (
+                                        <tr 
+                                            key={shift.shiftId} 
+                                            className={`border-b border-gray-200 hover:bg-purple-50 transition-colors duration-150 ${
+                                                index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                                            }`}
+                                        >
+                                            <td className="px-4 py-3 font-medium text-gray-800">{shift.name}</td>
+                                            <td className="px-4 py-3">
+                                                {shift.isEditing ? (
+                                                    <input
+                                                        type="text"
+                                                        value={shift.clockIn}
+                                                        onChange={(e) => updateClockIn(shift.shiftId, e.target.value)}
+                                                        className="w-full border-2 border-candy-purple rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-candy-purple/20"
+                                                        style={{ maxWidth: 85 }}
+                                                    />
+                                                ) : (
+                                                    <span className="text-gray-700">{shift.clockIn}</span>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                {shift.isEditing ? (
+                                                    <input
+                                                        type="text"
+                                                        value={shift.clockOut}
+                                                        onChange={(e) => updateClockOut(shift.shiftId, e.target.value)}
+                                                        className="w-full border-2 border-candy-purple rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-candy-purple/20"
+                                                        style={{ maxWidth: 85 }}
+                                                    />
+                                                ) : (
+                                                    <span className="text-gray-700">{shift.clockOut}</span>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-3 font-semibold text-candy-purple">{shift.timeWorked}</td>
+                                            <td className="px-4 py-3">
+                                                <div className="flex gap-2">
+                                                    {shift.isEditing ? (
+                                                        <>
+                                                            <button
+                                                                onClick={() => saveShift(shift.shiftId)}
+                                                                className="bg-gradient-to-r from-candy-mint to-green-400 hover:from-green-400 hover:to-candy-mint text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                                                            >
+                                                                ✓ Save
+                                                            </button>
+                                                            <button
+                                                                onClick={() => navigate(0)}
+                                                                className="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                                                            >
+                                                                ✕ Cancel
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <button
+                                                                onClick={() => toggleEdit(shift.shiftId)}
+                                                                className="bg-candy-yellow hover:bg-yellow-400 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                                                            >
+                                                                ✏️ Edit
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDelete(shift.shiftId)}
+                                                                className="bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                                                            >
+                                                                🗑️ Delete
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 };
 

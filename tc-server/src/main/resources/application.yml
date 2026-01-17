@@ -29,8 +29,18 @@ spring:
           starttls:
             enable: true
             required: true
-        debug: false
+        debug: true
+        transport:
+          protocol: smtp
 
 # Admin password
 admin:
   password: ${ADMIN_PASSWORD:cherry}
+
+# Logging configuration
+logging:
+  level:
+    timeclock.services.EmailService: DEBUG
+    org.springframework.mail: DEBUG
+    jakarta.mail: DEBUG
+    com.sun.mail: DEBUG
