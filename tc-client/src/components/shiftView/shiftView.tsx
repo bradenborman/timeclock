@@ -99,7 +99,7 @@ const ShiftView: React.FC = () => {
             
             {/* Sidebar */}
             <div className="bg-gradient-to-b from-blue-600 to-blue-700 text-white w-72 p-6 fixed h-full shadow-2xl">
-                <div className="mb-8">
+                <div className="mb-8 text-center">
                     <h3 className="text-2xl font-bold fancy-text mb-1">🍬 The Candy Factory</h3>
                     <p className="text-xl font-semibold text-blue-100">Timesheet</p>
                 </div>
@@ -149,15 +149,15 @@ const ShiftView: React.FC = () => {
                                     {shifts.map((shift, index) => (
                                         <tr 
                                             key={shift.shiftId} 
-                                            className={`text-center border-b border-gray-100 hover:bg-blue-50 transition-colors duration-150 ${
+                                            className={`text-center border-b border-gray-100 hover:bg-blue-50 transition-colors duration-150 h-20 ${
                                                 index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
                                             }`}
                                         >
                                             <td className="px-6 py-4 text-left font-medium text-gray-800">
                                                 {shift.name}
                                             </td>
-                                            <td className="px-6 py-3 text-gray-700">{shift.clockIn}</td>
-                                            <td className="px-6 py-3">
+                                            <td className="px-6 py-4 text-gray-700">{shift.clockIn}</td>
+                                            <td className="px-6 py-4">
                                                 {shift.clockIn && !shift.clockOut ? (
                                                     <button
                                                         onClick={() => handleClockOut(shift.shiftId)}
@@ -182,7 +182,7 @@ const ShiftView: React.FC = () => {
                                                     <span className="text-gray-700">{shift.clockOut || '—'}</span>
                                                 )}
                                             </td>
-                                            <td className="px-6 py-3 font-semibold text-blue-600">{shift.timeWorked || '—'}</td>
+                                            <td className="px-6 py-4 font-semibold text-blue-600">{shift.timeWorked || '—'}</td>
                                         </tr>
                                     ))}
                                 </tbody>
