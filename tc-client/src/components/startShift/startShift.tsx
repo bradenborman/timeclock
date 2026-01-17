@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDarkMode } from '../../contexts/DarkModeContext';
 
 enum UserStatus {
     NOT_SET = 'NOT_SET',
@@ -21,6 +22,7 @@ const StartShift: React.FC = () => {
     const [employees, setEmployees] = useState<User[]>([]);
     const [selectedEmployee, setSelectedEmployee] = useState<string>();
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingEmployees, setIsLoadingEmployees] = useState(false);
     const navigate = useNavigate();
 
     //NEW USER VARS 
@@ -33,6 +35,9 @@ const StartShift: React.FC = () => {
     // Validation states
     const [emailError, setEmailError] = useState('');
     const [phoneError, setPhoneError] = useState('');
+    
+    // Random key to force browser to not remember fields
+    const [formKey, setFormKey] = useState(Date.now());
 
     // Calculate progress
     const calculateProgress = () => {
@@ -78,18 +83,50 @@ const StartShift: React.FC = () => {
 
 
     useEffect(() => {
+        setIsLoadingEmployees(true);
         axios.get('/api/users')
             .then(response => {
                 console.log(response.data)
-                setEmployees(response.data);
+                // Sort employees alphabetically by name
+                const sortedEmployees = response.data.sort((a: User, b: User) => 
+                    a.name.localeCompare(b.name)
+                );
+                setEmployees(sortedEmployees);
+                setIsLoadingEmployees(false);
             })
             .catch(error => {
                 console.error('Error fetching users:', error);
+                setIsLoadingEmployees(false);
             });
     }, []);
 
+    // Group employees by first letter
+    const groupEmployeesByLetter = () => {
+        const grouped: { [key: string]: User[] } = {};
+        
+        employees.forEach(employee => {
+            const firstLetter = employee.name.charAt(0).toUpperCase();
+            if (!grouped[firstLetter]) {
+                grouped[firstLetter] = [];
+            }
+            grouped[firstLetter].push(employee);
+        });
+        
+        return grouped;
+    };
+
     const handleUserStatusChange = (status: UserStatus) => {
         setUserStatus(status);
+        // Reset form and generate new key when switching to NEW user
+        if (status === UserStatus.NEW) {
+            setName('');
+            setEmail('');
+            setPhoneNumber('');
+            setPhysicalMailingAddress('');
+            setEmailError('');
+            setPhoneError('');
+            setFormKey(Date.now()); // Force form to re-render with new key
+        }
     };
 
     const handleNewUserSubmit = (e: React.FormEvent): void => {
@@ -246,7 +283,7 @@ const StartShift: React.FC = () => {
                                 </div>
                             </div>
                             
-                            <form onSubmit={handleNewUserSubmit} className="p-8" autoComplete="off">
+                            <form key={formKey} onSubmit={handleNewUserSubmit} className="p-8" autoComplete="off">
                                 {/* Hidden honeypot to confuse autofill */}
                                 <input type="text" name="fakeusernameremembered" style={{position: 'absolute', top: '-9999px', left: '-9999px'}} tabIndex={-1} autoComplete="off" />
                                 <input type="password" name="fakepasswordremembered" style={{position: 'absolute', top: '-9999px', left: '-9999px'}} tabIndex={-1} autoComplete="new-password" />
@@ -420,9 +457,36 @@ const StartShift: React.FC = () => {
                                         onChange={(e) => setSelectedEmployee(e.target.value)}
                                     >
                                         <option value="">Choose your name from the list...</option>
-                                        {employees.map((employee, index) => (
-                                            <option key={index} value={employee.userId}>{employee.name}</option>
-                                        ))}
+                                        {Object.entries(groupEmployeesByLetter())
+                                            .sort(([letterA], [letterB]) => letterA.localeCompare(letterB))
+                                            .map(([letter, employeesInGroup]) => (
+                                                <React.Fragment key={letter}>
+                                                    <option 
+                                                        disabled 
+                                                        className="font-bold text-2xl bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800 py-2"
+                                                        style={{
+                                                            fontWeight: 'bold',
+                                                            fontSize: '1.25rem',
+                                                            backgroundColor: '#dbeafe',
+                                                            color: '#1e40af',
+                                                            padding: '0.5rem'
+                                                        }}
+                                                    >
+                                                        ━━━ {letter} ━━━
+                                                    </option>
+                                                    {employeesInGroup.map((employee) => (
+                                                        <option 
+                                                            key={employee.userId} 
+                                                            value={employee.userId}
+                                                            className="pl-6"
+                                                            style={{ paddingLeft: '1.5rem' }}
+                                                        >
+                                                            {employee.name}
+                                                        </option>
+                                                    ))}
+                                                </React.Fragment>
+                                            ))
+                                        }
                                     </select>
                                 </label>
                                 

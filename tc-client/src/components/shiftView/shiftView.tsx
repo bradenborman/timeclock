@@ -4,6 +4,9 @@ import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import Toast from '../../components/toast/toast';
+import DarkModeToggle from '../darkModeToggle/DarkModeToggle';
+import { useDarkMode } from '../../contexts/DarkModeContext';
+import { TableSkeleton } from '../skeleton/Skeleton';
 
 export interface Shift {
     shiftId: number;
@@ -22,6 +25,10 @@ const ShiftView: React.FC = () => {
     let { newestUser } = location.state || {};
 
     const [shifts, setShifts] = useState<Shift[]>([]);
+    const [hideCompleted, setHideCompleted] = useState<boolean>(false);
+    const [clockOutMessage, setClockOutMessage] = useState<string>('');
+    const [isLoadingShifts, setIsLoadingShifts] = useState<boolean>(true);
+    const { isDarkMode } = useDarkMode();
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -29,19 +36,32 @@ const ShiftView: React.FC = () => {
             if (newestUser) {
                 navigate(location.pathname, { state: { ...restState }, replace: true });
             }
-        }, 3000); 0
+        }, 3000);
         return () => clearTimeout(timer);
     }, [location, navigate]);
 
+    // Clear clock out message after showing
+    useEffect(() => {
+        if (clockOutMessage) {
+            const timer = setTimeout(() => {
+                setClockOutMessage('');
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [clockOutMessage]);
+
 
     useEffect(() => {
+        setIsLoadingShifts(true);
         axios.get(`/api/shifts`)
             .then(response => {
                 console.log(response.data)
                 setShifts(response.data);
+                setIsLoadingShifts(false);
             })
             .catch(error => {
                 console.error('Error fetching shifts:', error);
+                setIsLoadingShifts(false);
             })
 
     }, []);
@@ -83,6 +103,9 @@ const ShiftView: React.FC = () => {
                 });
 
                 setShifts(newShifts);
+                
+                // Show success toast with name and hours worked
+                setClockOutMessage(`${updatedShift.name} clocked out! Worked ${response.data}`);
             })
             .catch(error => {
                 console.error('Error clocking out:', error);
@@ -93,102 +116,291 @@ const ShiftView: React.FC = () => {
 
     const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
+    // Filter shifts based on hideCompleted state
+    const displayedShifts = hideCompleted 
+        ? shifts.filter(s => !s.clockOut) 
+        : shifts;
+
     return (
-        <div className="flex h-screen bg-gray-50">
+        <div className={`flex h-screen ${isDarkMode ? 'bg-gradient-to-br from-gray-900 to-gray-800' : 'bg-gradient-to-br from-gray-50 to-blue-50'}`}>
             {newestUser != undefined ? (<Toast message={newestUser + " has started a shift!"} />) : null}
+            {clockOutMessage && <Toast message={clockOutMessage} />}
             
-            {/* Sidebar */}
-            <div className="bg-gradient-to-b from-blue-600 to-blue-700 text-white w-72 p-6 fixed h-full shadow-2xl">
-                <div className="mb-8 text-center">
-                    <h3 className="text-2xl font-bold fancy-text mb-1">🍬 The Candy Factory</h3>
-                    <p className="text-xl font-semibold text-blue-100">Timesheet</p>
+            {/* Modern Sidebar */}
+            <div className={`w-80 p-8 fixed h-full shadow-xl border-r flex flex-col ${
+                isDarkMode 
+                    ? 'bg-gray-800 border-gray-700' 
+                    : 'bg-white border-gray-100'
+            }`}>
+                <div className="mb-10 text-center">
+                    <div className="text-5xl mb-3">🍬</div>
+                    <h3 className={`text-3xl font-bold fancy-text mb-1 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>The Candy Factory</h3>
+                    <p className={`text-lg font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Timesheet</p>
                 </div>
-                <div className="mb-6 bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                    <h2 className="text-sm font-semibold text-white/90">{today}</h2>
+                
+                <div className={`mb-8 rounded-2xl p-4 border ${
+                    isDarkMode 
+                        ? 'bg-gradient-to-r from-blue-900 to-blue-800 border-blue-700' 
+                        : 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200'
+                }`}>
+                    <div className={`text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Today's Date</div>
+                    <h2 className={`text-base font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{today}</h2>
                 </div>
-                <div className="h-px bg-white/20 mb-6"></div>
-                <nav className="space-y-4">
+                
+                <nav className="space-y-3 mb-8">
                     <Link 
                         to="/start-shift" 
-                        className="block text-4xl font-bold text-white hover:text-blue-200 transition-all duration-300 hover:translate-x-2 transform"
+                        className={`group flex items-center rounded-2xl p-5 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] ${
+                            isDarkMode
+                                ? 'bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white'
+                                : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
+                        }`}
                     >
-                        ▶ Start Shift
+                        <div className="flex-1">
+                            <div className="text-3xl font-bold mb-1">Start Shift</div>
+                            <div className={`text-sm ${isDarkMode ? 'text-blue-200' : 'text-blue-100'}`}>Clock in for today</div>
+                        </div>
+                        <span className="text-3xl transform group-hover:translate-x-1 transition-transform duration-200">▶</span>
                     </Link>
+                    
                     <Link 
                         to="/note" 
-                        className="flex items-center text-lg text-white/90 hover:text-white hover:bg-white/10 rounded-lg p-3 transition-all duration-200"
+                        className={`group flex items-center rounded-2xl p-4 transition-all duration-200 hover:shadow-md border-2 ${
+                            isDarkMode
+                                ? 'bg-gray-700 hover:bg-gray-600 border-gray-600 hover:border-blue-500'
+                                : 'bg-white hover:bg-gray-50 border-gray-200 hover:border-blue-300'
+                        }`}
                     >
-                        <span className="text-2xl mr-3">📝</span>
-                        <span>Leave a Note</span>
+                        <span className="text-3xl mr-4">📝</span>
+                        <div className="flex-1">
+                            <div className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Leave a Note</div>
+                            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Send a message</div>
+                        </div>
+                        <span className={`transform group-hover:translate-x-1 transition-transform duration-200 ${isDarkMode ? 'text-gray-400' : 'text-gray-400'}`}>→</span>
                     </Link>
+                    
                     <Link 
                         to="/admin" 
-                        className="flex items-center text-lg text-white/90 hover:text-white hover:bg-white/10 rounded-lg p-3 transition-all duration-200"
+                        className={`group flex items-center rounded-2xl p-4 transition-all duration-200 hover:shadow-md border-2 ${
+                            isDarkMode
+                                ? 'bg-gray-700 hover:bg-gray-600 border-gray-600 hover:border-blue-500'
+                                : 'bg-white hover:bg-gray-50 border-gray-200 hover:border-blue-300'
+                        }`}
                     >
-                        <span className="text-2xl mr-3">👤</span>
-                        <span>Admin Panel</span>
+                        <span className="text-3xl mr-4">👤</span>
+                        <div className="flex-1">
+                            <div className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Admin Panel</div>
+                            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Manage shifts</div>
+                        </div>
+                        <span className={`transform group-hover:translate-x-1 transition-transform duration-200 ${isDarkMode ? 'text-gray-400' : 'text-gray-400'}`}>→</span>
                     </Link>
                 </nav>
+                
+                {/* Stats in Sidebar */}
+                {shifts.length > 0 && (
+                    <div className="mt-auto space-y-1.5">
+                        <div className={`text-xs font-medium mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>TODAY'S STATS</div>
+                        <div className={`flex items-center justify-between py-1.5 px-3 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                            <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Total Employees</span>
+                            <span className={`text-base font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{shifts.length}</span>
+                        </div>
+                        <div className={`flex items-center justify-between py-1.5 px-3 rounded-lg ${isDarkMode ? 'bg-green-900/30' : 'bg-green-50'}`}>
+                            <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Currently Working</span>
+                            <span className={`text-base font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
+                                {shifts.filter(s => s.clockIn && !s.clockOut).length}
+                            </span>
+                        </div>
+                        <div className={`flex items-center justify-between py-1.5 px-3 rounded-lg ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-50'}`}>
+                            <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Clocked Out</span>
+                            <span className={`text-base font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                                {shifts.filter(s => s.clockOut).length}
+                            </span>
+                        </div>
+                    </div>
+                )}
+                
+                {/* Footer decoration */}
+                <div className="mt-6">
+                    <div className={`h-1 rounded-full ${
+                        isDarkMode 
+                            ? 'bg-gradient-to-r from-blue-800 via-blue-600 to-blue-800' 
+                            : 'bg-gradient-to-r from-blue-200 via-blue-400 to-blue-200'
+                    }`}></div>
+                </div>
             </div>
 
-            {/* Main Content */}
-            <div className="flex-1 ml-72 p-8 overflow-auto">
+            {/* Main Content Area */}
+            <div className="flex-1 ml-80 p-8 overflow-auto">
+                {/* Dark Mode Toggle - Top Right */}
+                <div className="absolute top-6 right-6 z-10">
+                    <DarkModeToggle />
+                </div>
+                
                 <div className="max-w-7xl mx-auto">
-                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden animate-fade-in">
+                    {/* Header */}
+                    <div className="mb-8 flex items-center justify-between">
+                        <h1 className={`text-4xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Today's Shifts</h1>
+                        
+                        {/* Hide Completed Toggle */}
+                        <button
+                            onClick={() => setHideCompleted(!hideCompleted)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                hideCompleted 
+                                    ? isDarkMode
+                                        ? 'bg-blue-700 text-white shadow-md hover:bg-blue-800'
+                                        : 'bg-blue-600 text-white shadow-md hover:bg-blue-700'
+                                    : isDarkMode
+                                        ? 'bg-gray-700 text-gray-200 border-2 border-gray-600 hover:border-blue-500 hover:bg-gray-600'
+                                        : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                            }`}
+                        >
+                            <span className="text-lg">{hideCompleted ? '👁️' : '👁️‍🗨️'}</span>
+                            <span>{hideCompleted ? 'Show All' : 'Hide Completed'}</span>
+                        </button>
+                    </div>
+                    
+                    {/* Modern Table Card */}
+                    {isLoadingShifts ? (
+                        <TableSkeleton />
+                    ) : (
+                        <div className={`rounded-3xl shadow-xl overflow-hidden border ${
+                            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'
+                        }`}>
                         <div className="overflow-x-auto">
-                            <table className="table-auto w-full text-xl">
-                                <thead className="sticky top-0 bg-blue-600 text-white">
-                                    <tr>
-                                        <th className="px-6 py-4 w-3/5 text-left font-semibold">Name</th>
-                                        <th className="px-6 py-4 min-w-[120px] w-[10%] font-semibold">Time In</th>
-                                        <th className="px-6 py-4 min-w-[120px] w-[10%] font-semibold">Time Out</th>
-                                        <th className="px-6 py-4 min-w-[130px] w-[10%] text-lg font-semibold">⏱ Worked</th>
+                            <table className="table-auto w-full">
+                                <thead>
+                                    <tr className={`text-white ${
+                                        isDarkMode 
+                                            ? 'bg-gradient-to-r from-blue-800 to-blue-900' 
+                                            : 'bg-gradient-to-r from-blue-600 to-blue-700'
+                                    }`}>
+                                        <th className="px-6 py-5 text-left font-bold text-lg">
+                                            <div className="flex items-center">
+                                                <span className="mr-2">👤</span>
+                                                Name
+                                            </div>
+                                        </th>
+                                        <th className="px-6 py-5 font-bold text-lg">
+                                            <div className="flex items-center justify-center">
+                                                <span className="mr-2">🕐</span>
+                                                Time In
+                                            </div>
+                                        </th>
+                                        <th className="px-6 py-5 font-bold text-lg">
+                                            <div className="flex items-center justify-center">
+                                                <span className="mr-2">🕐</span>
+                                                Time Out
+                                            </div>
+                                        </th>
+                                        <th className="px-6 py-5 font-bold text-lg">
+                                            <div className="flex items-center justify-center">
+                                                <span className="mr-2">⏱</span>
+                                                Hours Worked
+                                            </div>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {shifts.map((shift, index) => (
-                                        <tr 
-                                            key={shift.shiftId} 
-                                            className={`text-center border-b border-gray-100 hover:bg-blue-50 transition-colors duration-150 h-20 ${
-                                                index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
-                                            }`}
-                                        >
-                                            <td className="px-6 py-4 text-left font-medium text-gray-800">
-                                                {shift.name}
+                                    {displayedShifts.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={4} className="px-6 py-16 text-center">
+                                                <div className="text-6xl mb-4">📋</div>
+                                                <div className={`text-xl font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                    {hideCompleted && shifts.length > 0 
+                                                        ? 'All shifts completed!' 
+                                                        : 'No shifts yet today'}
+                                                </div>
+                                                <div className={`mt-2 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                    {hideCompleted && shifts.length > 0 
+                                                        ? 'Everyone has clocked out' 
+                                                        : 'Clock in to get started!'}
+                                                </div>
                                             </td>
-                                            <td className="px-6 py-4 text-gray-700">{shift.clockIn}</td>
-                                            <td className="px-6 py-4">
-                                                {shift.clockIn && !shift.clockOut ? (
-                                                    <button
-                                                        onClick={() => handleClockOut(shift.shiftId)}
-                                                        className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 ${
-                                                            shift.isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                                                        }`}
-                                                        disabled={shift.isLoading}
-                                                    >
-                                                        {shift.isLoading ? (
-                                                            <span className="flex items-center">
-                                                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                                </svg>
-                                                                Clocking Out...
-                                                            </span>
-                                                        ) : (
-                                                            'Clock Out'
-                                                        )}
-                                                    </button>
-                                                ) : (
-                                                    <span className="text-gray-700">{shift.clockOut || '—'}</span>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4 font-semibold text-blue-600">{shift.timeWorked || '—'}</td>
                                         </tr>
-                                    ))}
+                                    ) : (
+                                        displayedShifts.map((shift, index) => (
+                                            <tr 
+                                                key={shift.shiftId} 
+                                                className={`text-center border-b transition-all duration-150 ${
+                                                    displayedShifts.length > 5 ? 'h-14' : 'h-20'
+                                                } ${
+                                                    isDarkMode
+                                                        ? index % 2 === 0 
+                                                            ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' 
+                                                            : 'bg-gray-750 border-gray-700 hover:bg-gray-700'
+                                                        : index % 2 === 0 
+                                                            ? 'bg-white border-gray-100 hover:bg-blue-50' 
+                                                            : 'bg-gray-50/50 border-gray-100 hover:bg-blue-50'
+                                                }`}
+                                            >
+                                                <td className={`text-left ${displayedShifts.length > 5 ? 'px-4 py-2' : 'px-6 py-4'}`}>
+                                                    <div className={`font-semibold ${displayedShifts.length > 5 ? 'text-base' : 'text-lg'} ${
+                                                        isDarkMode ? 'text-white' : 'text-gray-800'
+                                                    }`}>{shift.name}</div>
+                                                </td>
+                                                <td className={displayedShifts.length > 5 ? 'px-4 py-2' : 'px-6 py-4'}>
+                                                    <span className={`inline-flex items-center ${displayedShifts.length > 5 ? 'px-3 py-1 text-sm' : 'px-4 py-2'} rounded-full font-medium ${
+                                                        isDarkMode 
+                                                            ? 'bg-green-900/40 text-green-300' 
+                                                            : 'bg-green-100 text-green-700'
+                                                    }`}>
+                                                        {shift.clockIn}
+                                                    </span>
+                                                </td>
+                                                <td className={displayedShifts.length > 5 ? 'px-4 py-2' : 'px-6 py-4'}>
+                                                    {shift.clockIn && !shift.clockOut ? (
+                                                        <button
+                                                            onClick={() => handleClockOut(shift.shiftId)}
+                                                            className={`text-white font-bold ${
+                                                                displayedShifts.length > 5 ? 'py-2 px-4 text-sm' : 'py-3 px-6'
+                                                            } rounded-xl shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 ${
+                                                                shift.isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                                                            } ${
+                                                                isDarkMode
+                                                                    ? 'bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900'
+                                                                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
+                                                            }`}
+                                                            disabled={shift.isLoading}
+                                                        >
+                                                            {shift.isLoading ? (
+                                                                <span className="flex items-center">
+                                                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                    </svg>
+                                                                    Clocking Out...
+                                                                </span>
+                                                            ) : (
+                                                                '⏹ Clock Out'
+                                                            )}
+                                                        </button>
+                                                    ) : (
+                                                        <span className={`inline-flex items-center ${displayedShifts.length > 5 ? 'px-3 py-1 text-sm' : 'px-4 py-2'} rounded-full font-medium ${
+                                                            isDarkMode 
+                                                                ? 'bg-red-900/40 text-red-300' 
+                                                                : 'bg-red-100 text-red-700'
+                                                        }`}>
+                                                            {shift.clockOut || '—'}
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td className={displayedShifts.length > 5 ? 'px-4 py-2' : 'px-6 py-4'}>
+                                                    <span className={`inline-flex items-center ${displayedShifts.length > 5 ? 'px-3 py-1 text-base' : 'px-4 py-2 text-lg'} rounded-full font-bold ${
+                                                        isDarkMode 
+                                                            ? 'bg-blue-900/40 text-blue-300' 
+                                                            : 'bg-blue-100 text-blue-700'
+                                                    }`}>
+                                                        {shift.timeWorked || '—'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                    )}
                 </div>
             </div>
         </div>
