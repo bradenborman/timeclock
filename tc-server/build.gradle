@@ -22,6 +22,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	//DB Driver
 	implementation 'com.mysql:mysql-connector-j'
@@ -42,7 +43,9 @@ task copyClient(dependsOn: ":tc-client:clientBuild") {
 
 	doFirst {
 		delete "src/main/resources/static"
-		delete "src/main/resources/templates"
+		delete fileTree("src/main/resources/templates") {
+			exclude "login.html"
+		}
 	}
 	doLast {
 		copy {

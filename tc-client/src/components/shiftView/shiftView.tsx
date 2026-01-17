@@ -25,10 +25,18 @@ const ShiftView: React.FC = () => {
     let { newestUser } = location.state || {};
 
     const [shifts, setShifts] = useState<Shift[]>([]);
-    const [hideCompleted, setHideCompleted] = useState<boolean>(false);
+    const [hideCompleted, setHideCompleted] = useState<boolean>(() => {
+        const saved = localStorage.getItem('hideCompleted');
+        return saved === 'true';
+    });
     const [clockOutMessage, setClockOutMessage] = useState<string>('');
     const [isLoadingShifts, setIsLoadingShifts] = useState<boolean>(true);
     const { isDarkMode } = useDarkMode();
+
+    // Save hideCompleted preference to localStorage
+    useEffect(() => {
+        localStorage.setItem('hideCompleted', hideCompleted.toString());
+    }, [hideCompleted]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
