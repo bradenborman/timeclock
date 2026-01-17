@@ -3,9 +3,17 @@ spring:
     prefix: classpath:/static/
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    hikari:
-#      connection-test-query: SELECT * from Shiftsss
-#      validation-timeout: 5000
+    hikari:
+      maximum-pool-size: 5
+      connection-timeout: 30000
+  sql:
+    init:
+      mode: always
+      continue-on-error: false
+      platform: mysql
+  jpa:
+    hibernate:
+      ddl-auto: none
   mail:
     host: smtp.gmail.com
     port: 587

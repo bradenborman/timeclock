@@ -1,13 +1,11 @@
 [phases.setup]
 nixPkgs = ["nodejs", "gradle"]
 
-[phases.install]
-cmds = [
-  "cd tc-client && pnpm install --frozen-lockfile"
-]
-
 [phases.build]
-cmds = ["chmod +x gradlew && ./gradlew build -x test"]
+cmds = [
+  "chmod +x gradlew",
+  "./gradlew build -x test"
+]
 
 [start]
 cmd = "java $JAVA_OPTS -Dserver.port=$PORT -jar tc-server/build/libs/timeclock.jar"

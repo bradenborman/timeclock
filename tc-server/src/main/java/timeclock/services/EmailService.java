@@ -25,17 +25,13 @@ public class EmailService {
     public void sendWorksheetEmail(ByteArrayResource file, List<Note> notes, LocalDate dateOfQuery) {
         String formattedDateString = DateUtility.formatDateForFileName(dateOfQuery);
 
-        String[] receivingAddress =  new String[] {
-                "amyatkinson19@hotmail.com",
-                "mike@thecandyfactory.biz"
-        };
+        String receivingAddress = "bradenborman00@gmail.com";
 
         MimeMessage message = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             helper.setTo(receivingAddress);
             helper.setSubject(formattedDateString + " Timesheet");
-            helper.setBcc(new String[]{"bradenborman00@gmail.com", "candyfactorydonotreply@gmail.com"});
 
             // Build the email body
             StringBuilder emailBody = new StringBuilder("<p>Attached is today's Time-clock</p>" +

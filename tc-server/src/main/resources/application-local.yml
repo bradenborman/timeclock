@@ -3,7 +3,5 @@ spring:
     ansi:
       enabled: always
   datasource:
-    url: jdbc:mysql://caboose.proxy.rlwy.net:25228/railway?useSSL=false&serverTimezone=America/Chicago&allowPublicKeyRetrieval=true
-    username: root
-    password: ZeCXopZwhazUTALHjvYcmzmpxUyoYElB
     driver-class-name: com.mysql.cj.jdbc.Driver
+    # Database credentials are in application-secret.yml (not in git)
