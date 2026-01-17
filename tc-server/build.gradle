@@ -43,9 +43,7 @@ task copyClient(dependsOn: ":tc-client:clientBuild") {
 
 	doFirst {
 		delete "src/main/resources/static"
-		delete fileTree("src/main/resources/templates") {
-			exclude "login.html"
-		}
+		delete "src/main/resources/templates"
 	}
 	doLast {
 		copy {
@@ -54,6 +52,10 @@ task copyClient(dependsOn: ":tc-client:clientBuild") {
 		}
 		copy {
 			from new File(project(":tc-client").getProjectDir(), "build/index.html")
+			into "src/main/resources/templates"
+		}
+		copy {
+			from new File(project(":tc-client").getProjectDir(), "login.html")
 			into "src/main/resources/templates"
 		}
 	}

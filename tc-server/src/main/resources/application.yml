@@ -34,6 +34,9 @@ spring:
         transport:
           protocol: smtp
 
+server:
+  forward-headers-strategy: framework
+
 # Admin password
 admin:
   password: ${ADMIN_PASSWORD:cherry}
