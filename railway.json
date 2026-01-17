@@ -2,10 +2,10 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "chmod +x gradlew && ./gradlew build -x test"
+    "buildCommand": "chmod +x gradlew && ./gradlew clean build -x test --no-daemon"
   },
   "deploy": {
-    "startCommand": "java $JAVA_OPTS -Dserver.port=$PORT -jar tc-server/build/libs/timeclock.jar",
+    "startCommand": "java -Dserver.port=$PORT -jar tc-server/build/libs/timeclock.jar",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }

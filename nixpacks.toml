@@ -1,11 +1,11 @@
 [phases.setup]
-nixPkgs = ["nodejs", "gradle"]
+nixPkgs = ["jdk21"]
 
 [phases.build]
 cmds = [
   "chmod +x gradlew",
-  "./gradlew build -x test"
+  "./gradlew clean build -x test --no-daemon"
 ]
 
 [start]
-cmd = "java $JAVA_OPTS -Dserver.port=$PORT -jar tc-server/build/libs/timeclock.jar"
+cmd = "java -Dserver.port=$PORT -jar tc-server/build/libs/timeclock.jar"
