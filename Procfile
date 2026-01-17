@@ -1,1 +1,1 @@
-web java $JAVA_OPTS -Dserver.port=$PORT -jar tc-server/build/libs/timeclock.jar
+web: java $JAVA_OPTS -Dserver.port=$PORT -jar tc-server/build/libs/timeclock.jar
