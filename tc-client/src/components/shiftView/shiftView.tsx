@@ -94,14 +94,14 @@ const ShiftView: React.FC = () => {
     const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
     return (
-        <div className="flex h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+        <div className="flex h-screen bg-gray-50">
             {newestUser != undefined ? (<Toast message={newestUser + " has started a shift!"} />) : null}
             
             {/* Sidebar */}
-            <div className="bg-gradient-to-b from-candy-purple to-candy-blue text-white w-72 p-6 fixed h-full shadow-2xl">
+            <div className="bg-gradient-to-b from-blue-600 to-blue-700 text-white w-72 p-6 fixed h-full shadow-2xl">
                 <div className="mb-8">
-                    <h3 className="text-2xl font-bold fancy-text mb-2 text-candy-yellow">🍬 The Candy Factory</h3>
-                    <p className="text-sm text-white/80">Timesheet</p>
+                    <h3 className="text-2xl font-bold fancy-text mb-1">🍬 The Candy Factory</h3>
+                    <p className="text-xl font-semibold text-blue-100">Timesheet</p>
                 </div>
                 <div className="mb-6 bg-white/10 backdrop-blur-sm rounded-lg p-3">
                     <h2 className="text-sm font-semibold text-white/90">{today}</h2>
@@ -110,7 +110,7 @@ const ShiftView: React.FC = () => {
                 <nav className="space-y-4">
                     <Link 
                         to="/start-shift" 
-                        className="block text-4xl font-bold text-white hover:text-candy-yellow transition-all duration-300 hover:translate-x-2 transform"
+                        className="block text-4xl font-bold text-white hover:text-blue-200 transition-all duration-300 hover:translate-x-2 transform"
                     >
                         ▶ Start Shift
                     </Link>
@@ -137,7 +137,7 @@ const ShiftView: React.FC = () => {
                     <div className="bg-white rounded-2xl shadow-xl overflow-hidden animate-fade-in">
                         <div className="overflow-x-auto">
                             <table className="table-auto w-full text-xl">
-                                <thead className="sticky top-0 bg-gradient-to-r from-candy-purple to-candy-blue text-white">
+                                <thead className="sticky top-0 bg-blue-600 text-white">
                                     <tr>
                                         <th className="px-6 py-4 w-3/5 text-left font-semibold">Name</th>
                                         <th className="px-6 py-4 min-w-[120px] w-[10%] font-semibold">Time In</th>
@@ -149,7 +149,7 @@ const ShiftView: React.FC = () => {
                                     {shifts.map((shift, index) => (
                                         <tr 
                                             key={shift.shiftId} 
-                                            className={`text-center border-b border-gray-100 hover:bg-purple-50 transition-colors duration-150 ${
+                                            className={`text-center border-b border-gray-100 hover:bg-blue-50 transition-colors duration-150 ${
                                                 index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
                                             }`}
                                         >
@@ -161,7 +161,7 @@ const ShiftView: React.FC = () => {
                                                 {shift.clockIn && !shift.clockOut ? (
                                                     <button
                                                         onClick={() => handleClockOut(shift.shiftId)}
-                                                        className={`bg-gradient-to-r from-candy-pink to-candy-purple hover:from-candy-purple hover:to-candy-blue text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 ${
+                                                        className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 ${
                                                             shift.isLoading ? 'opacity-50 cursor-not-allowed' : ''
                                                         }`}
                                                         disabled={shift.isLoading}
@@ -182,7 +182,7 @@ const ShiftView: React.FC = () => {
                                                     <span className="text-gray-700">{shift.clockOut || '—'}</span>
                                                 )}
                                             </td>
-                                            <td className="px-6 py-3 font-semibold text-candy-purple">{shift.timeWorked || '—'}</td>
+                                            <td className="px-6 py-3 font-semibold text-blue-600">{shift.timeWorked || '—'}</td>
                                         </tr>
                                     ))}
                                 </tbody>

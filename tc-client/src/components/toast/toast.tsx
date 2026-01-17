@@ -29,7 +29,7 @@ const Toast: React.FC<ToastProps> = ({ message }) => {
 
     return (
         <div
-            className={`fixed bottom-32 left-1/2 transform -translate-x-1/2 px-8 py-4 bg-gradient-to-r from-candy-mint to-green-400 text-white text-3xl font-bold rounded-2xl shadow-2xl transition-all duration-500 ease-out ${
+            className={`fixed bottom-32 left-1/2 transform -translate-x-1/2 px-8 py-4 bg-green-500 text-white text-3xl font-bold rounded-2xl shadow-2xl transition-all duration-500 ease-out ${
                 show ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-72 opacity-0 scale-95'
             }`}
             style={{ transitionProperty: 'opacity, transform' }}
