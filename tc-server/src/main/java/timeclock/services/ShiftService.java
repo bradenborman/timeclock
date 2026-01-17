@@ -72,4 +72,8 @@ public class ShiftService {
         logger.info("Deleting all shifts prior to: {}", date);
         return shiftDao.deleteShiftsPriorToDate(date);
     }
+
+    public int countShiftsPriorToDate(LocalDate date) {
+        return shiftDao.countShiftsPriorToDate(date);
+    }
 }

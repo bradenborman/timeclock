@@ -155,13 +155,31 @@ public class TimeclockService {
 
     public Map<String, Object> generateSpreadsheetWithMetadata(LocalDate localDate) {
         logger.info("Generating spreadsheet with metadata for date: {}", localDate);
-        byte[] data = generateSpreadsheet(localDate);
+        List<UserShiftRow> userShifts = shiftService.retrieveUserShifts(localDate);
+        
+        if (userShifts.isEmpty()) {
+            throw new IllegalStateException("No shifts found for date: " + localDate);
+        }
+        
+        ByteArrayResource excelDocument = new WorkSheetBuilder().populateWorkbook(userShifts).toFile();
+        byte[] data;
+        try {
+            data = excelDocument.getByteArray();
+        } catch (Exception e) {
+            logger.error("Error converting spreadsheet to byte array", e);
+            throw new RuntimeException("Failed to generate spreadsheet", e);
+        }
+        
         String filename = DateUtility.formatDateForFileName(localDate) + "-timesheet.xlsx";
         
         return Map.of(
             "data", data,
             "filename", filename
         );
+    }
+
+    public int countShiftsPriorToDate(LocalDate date) {
+        return shiftService.countShiftsPriorToDate(date);
     }
 
 

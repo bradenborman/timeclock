@@ -103,13 +103,28 @@ public class ApiController {
 
     @GetMapping("/spreadsheet/download")
     public ResponseEntity<byte[]> downloadSpreadsheet(@RequestParam String date) {
+        try {
+            LocalDate localDate = LocalDate.parse(date);
+            Map<String, Object> result = timeclockService.generateSpreadsheetWithMetadata(localDate);
+            
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=\"" + result.get("filename") + "\"")
+                    .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    .body((byte[]) result.get("data"));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(404).body(null);
+        }
+    }
+
+    @GetMapping("/shifts/prior-to/count")
+    public ResponseEntity<Map<String, Object>> countShiftsPriorToDate(@RequestParam String date) {
         LocalDate localDate = LocalDate.parse(date);
-        Map<String, Object> result = timeclockService.generateSpreadsheetWithMetadata(localDate);
+        int count = timeclockService.countShiftsPriorToDate(localDate);
         
-        return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=\"" + result.get("filename") + "\"")
-                .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-                .body((byte[]) result.get("data"));
+        return ResponseEntity.ok(Map.of(
+                "count", count,
+                "date", date
+        ));
     }
 
     @DeleteMapping("/shifts/prior-to")

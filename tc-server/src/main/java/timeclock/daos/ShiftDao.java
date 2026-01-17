@@ -149,4 +149,12 @@ public class ShiftDao {
         return namedParameterJdbcTemplate.update(sql, params);
     }
 
+    public int countShiftsPriorToDate(LocalDate date) {
+        String sql = "SELECT COUNT(*) FROM Shifts WHERE DATE(clockIn) < :date";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("date", date);
+        Integer count = namedParameterJdbcTemplate.queryForObject(sql, params, Integer.class);
+        return count != null ? count : 0;
+    }
+
 }
