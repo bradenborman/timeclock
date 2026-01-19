@@ -95,6 +95,14 @@ public class ApiController {
         return ResponseEntity.ok(timeclockService.updateShift(shift));
     }
 
+    @GetMapping("/time/current")
+    public ResponseEntity<Map<String, String>> getCurrentTime() {
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("h:mm a");
+        String formattedTime = now.format(formatter);
+        return ResponseEntity.ok(Map.of("currentTime", formattedTime));
+    }
+
     @GetMapping("/email/send")
     public ResponseEntity<Void> sendEmail() {
         timeclockService.sendDailySummaryEmail();
