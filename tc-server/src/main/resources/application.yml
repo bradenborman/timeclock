@@ -4,6 +4,7 @@ spring:
     suffix: .html
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL:}?serverTimezone=America/Chicago
     hikari:
       maximum-pool-size: 5
       connection-timeout: 30000
@@ -15,6 +16,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+  jackson:
+    time-zone: America/Chicago
   mail:
     host: smtp.gmail.com
     port: 587

@@ -5,7 +5,7 @@
     "buildCommand": "chmod +x gradlew && ./gradlew clean build -x test --no-daemon"
   },
   "deploy": {
-    "startCommand": "java -Dserver.port=$PORT -jar tc-server/build/libs/timeclock.jar",
+    "startCommand": "java -Duser.timezone=America/Chicago -Dserver.port=$PORT -jar tc-server/build/libs/timeclock.jar",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }

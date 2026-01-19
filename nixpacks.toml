@@ -8,4 +8,4 @@ cmds = [
 ]
 
 [start]
-cmd = "java -Dserver.port=$PORT -jar tc-server/build/libs/timeclock.jar"
+cmd = "java -Duser.timezone=America/Chicago -Dserver.port=$PORT -jar tc-server/build/libs/timeclock.jar"
